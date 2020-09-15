@@ -33,6 +33,7 @@ for /R "%specDirectory%" %%Y IN (*.*) do (
     set soulbind=%%~nY
     CALL "..\simc.exe" "GenericOptions.simc" "!baseFile!" "%%Y"
     MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST\R1\!spec!_!soulbind!.txt"
+    MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST\R1\!spec!_!soulbind!.json"
 )
 exit /B 0
 
@@ -44,6 +45,7 @@ for /R "%specDirectory%" %%Y IN (*.*) do (
     set soulbind=%%~nY
     CALL "..\simc.exe" "GenericOptions.simc" "!baseFile!" "%%Y"
     MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST\R5\!spec!_!soulbind!.txt"
+    MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST\R5\!spec!_!soulbind!.json"
 )
 exit /B 0
 
@@ -55,6 +57,7 @@ for /R "%specDirectory%" %%Y IN (*.*) do (
     set soulbind=%%~nY
     CALL "..\simc.exe" "GenericOptions.simc" "!baseFile!" "%%Y"
     MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST\R10\!spec!_!soulbind!.txt"
+    MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST\R10\!spec!_!soulbind!.json"
 )
 exit /B 0
 
@@ -66,5 +69,6 @@ for /R "%specDirectory%" %%Y IN (*.*) do (
     set soulbind=%%~nY
     CALL "..\simc.exe" "GenericOptions.simc" "!baseFile!" "%%Y"
     MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST\R15\!spec!_!soulbind!.txt"
+    MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST\R15\!spec!_!soulbind!.json"
 )
 exit /B 0

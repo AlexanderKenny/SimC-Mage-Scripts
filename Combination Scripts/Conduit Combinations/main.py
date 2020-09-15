@@ -1,5 +1,6 @@
 import networkx as nx
 from itertools import combinations
+import csv
 #----------------------------------------------------------------------------
 #Hit run at the top of the page. Follow on-screen instructions bottom right
 #Output will be found in output.simc on the left after program has finished
@@ -121,6 +122,15 @@ def replaceConduitText(path):
 def flattenList(l):
     return [item for sublist in l for item in sublist]
 
+def replaceNames(nameString):
+  with open("lookup.txt", mode='r') as csvLookup:
+    csvReader = csv.reader(csvLookup)
+    for row in csvReader:
+      if int(row[0]) >=  1000: #soulbind IDs should be safe enough to not occur as substr 
+        nameString = nameString.replace(row[0], row[1])
+      else: #conduit IDs could be substr so check we have a rank delim (:) as well
+        nameString = nameString.replace(row[0]+":", row[1]+":")
+  return nameString
 
 def getUserInputs():
     print('Please enter number for spec:')
@@ -510,7 +520,8 @@ def main():
                                 profileToPrint += endCond + ":" + rank + "/"
                         if (profileToPrint[-1] == '/'):
                             profileToPrint = profileToPrint[:-1]
-                        outputfile.write('profileset."' + profileToPrint +
+                        nameToPrint = replaceNames(profileToPrint)
+                        outputfile.write('profileset."' + nameToPrint +
                                          '"+=soulbind=')
                         outputfile.write(profileToPrint + '\n')
     print('Finished. Please find output in output file.')
