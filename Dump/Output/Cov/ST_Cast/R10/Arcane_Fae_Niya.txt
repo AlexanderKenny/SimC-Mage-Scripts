@@ -1,0 +1,312 @@
+
+ * Beta! Beta! Beta! Beta! Beta! Beta! 
+ * Not All classes are yet supported. 
+ * Some class models still need tweaking. 
+ * Some class action lists need tweaking. 
+ * Some class BiS gear setups need tweaking. 
+ * Some trinkets not yet implemented. 
+ * Constructive feedback regarding our output will shorten the Beta phase dramatically. 
+ * Beta! Beta! Beta! Beta! Beta! Beta! 
+
+
+Raid Events:
+  raid_event=/casting,cooldown=500,duration=500
+
+
+DPS Ranking:
+   7422 100.0%  Raid
+   7422  100.0%  arcane
+
+HPS Ranking:
+      0 100.0%%  Raid
+
+Player: arcane troll mage arcane 60
+  DPS=7422.251391788389 DPS-Error=14.465944589169135/0.19% DPS-Range=1060.2146360419993/14.28%
+  DPR=3.429742499579949 RPS-Out=2155.1373522458166 RPS-In=2042.239208387153 Resource=mana Waiting=0.0 ApM=36.99705580304792
+  Talents: 1032021
+  Covenant: night_fae
+  Core Stats:    strength=199|199(199)  agility=308|308(308)  stamina=434|414(414)  intellect=2569|2447(2447)  spirit=0|0(0)  health=8680|8280  mana=65086|65086
+  Generic Stats: mastery=30.17%|30.17%(600)  versatility=15.00%|15.00%(600)  leech=0.00%|0.00%(0)  runspeed=7.00%|7.00%(0)
+  Spell Stats:   power=2569|2447(0)  hit=15.00%|15.00%(0)  crit=22.14%|22.14%(600)  haste=18.18%|18.18%(600)  speed=18.18%|18.18%  manareg=1302|1302(0)
+  Attack Stats:  power=0|0(0)  hit=7.50%|7.50%(0)  crit=22.14%|22.14%(600)  expertise=7.50%|7.50%(0)  haste=18.18%|18.18%(600)  speed=18.18%|18.18%
+  Defense Stats: armor=0|0(0) miss=3.00%|3.00%  dodge=3.00%|3.00%(0)  parry=0.00%|0.00%(0)  block=0.00%|0.00%(0) crit=0.00%|0.00%  versatility=7.50%|7.50%(600)
+  Priorities (actions.precombat):
+    variable,name=have_opened,op=set,value=0/variable,name=final_burn,op=set,value=0/variable,name=rs_max_delay,op=set,value=5
+    variable,name=ap_max_delay,op=set,value=10/variable,name=rop_max_delay,op=set,value=20/variable,name=totm_max_delay,op=set,value=5
+    variable,name=totm_max_delay,op=set,value=3,if=runeforge.disciplinary_command.equipped
+    variable,name=totm_max_delay,op=set,value=15,if=covenant.night_fae.enabled
+    variable,name=totm_max_delay,op=set,value=15,if=conduit.arcane_prodigy.enabled/variable,name=barrage_mana_pct,op=set,value=70
+    variable,name=barrage_mana_pct,op=set,value=40,if=covenant.night_fae.enabled/variable,name=ap_minimum_mana_pct,op=set,value=20
+    variable,name=ap_minimum_mana_pct,op=set,value=50,if=runeforge.disciplinary_command.equipped
+    variable,name=ap_minimum_mana_pct,op=set,value=50,if=runeforge.grisly_icicle.equipped/flask/food/augmentation/arcane_familiar/arcane_intellect
+    conjure_mana_gem/snapshot_stats/mirror_image/potion/frostbolt
+  Priorities (actions.default):
+    counterspell,if=target.debuff.casting.react/call_action_list,name=aoe,if=active_enemies>2
+    call_action_list,name=opener,if=variable.have_opened=0/call_action_list,name=cooldowns/call_action_list,name=rotation,if=variable.final_burn=0
+    call_action_list,name=final_burn,if=variable.final_burn=1/call_action_list,name=movement
+  Priorities (actions.opener):
+    variable,name=have_opened,op=set,value=1,if=prev_gcd.1.evocation
+    fire_blast,if=runeforge.disciplinary_command.equipped&buff.disciplinary_command_frost.up
+    frost_nova,if=runeforge.grisly_icicle.equipped&mana.pct>95/mirrors_of_torment/deathborne/radiant_spark,if=mana.pct>40/touch_of_the_magi
+    arcane_power/rune_of_power,if=buff.rune_of_power.down
+    use_mana_gem,if=(talent.enlightened.enabled&mana.pct<=80&mana.pct>=65)|(!talent.enlightened.enabled&mana.pct<=85)
+    berserking,if=buff.arcane_power.up/time_warp,if=runeforge.temporal_warp.equipped
+    presence_of_mind,if=debuff.touch_of_the_magi.up&debuff.touch_of_the_magi.remains<=buff.presence_of_mind.max_stack*action.arcane_blast.execute_time
+    arcane_blast,if=dot.radiant_spark.remains>5|debuff.radiant_spark_vulnerability.stack>0
+    arcane_blast,if=buff.presence_of_mind.up&debuff.touch_of_the_magi.up&debuff.touch_of_the_magi.remains<=action.arcane_blast.execute_time
+    arcane_barrage,if=buff.arcane_power.up&buff.arcane_power.remains<=gcd&buff.arcane_charge.stack=buff.arcane_charge.max_stack
+    supernova,if=mana.pct<=95/arcane_missiles,if=debuff.touch_of_the_magi.up&talent.arcane_echo.enabled,chain=1
+    arcane_missiles,if=buff.clearcasting.react,chain=1
+    arcane_orb,if=buff.arcane_charge.stack<=2&(cooldown.arcane_power.remains>10|active_enemies<=2)
+    arcane_blast,if=buff.rune_of_power.up|mana.pct>15/evocation,if=buff.rune_of_power.down,interrupt_if=mana.pct>=85,interrupt_immediate=1
+    arcane_barrage
+  Priorities (actions.cooldowns):
+    berserking,if=buff.arcane_power.up
+    frost_nova,if=runeforge.grisly_icicle.equipped&cooldown.arcane_power.remains>30&cooldown.touch_of_the_magi.remains=0&(buff.arcane_charge.stack<=2&((talent.rune_of_power.enabled&cooldown.rune_of_power.remains<=gcd&cooldown.arcane_power.remains>variable.totm_max_delay)|(!talent.rune_of_power.enabled&cooldown.arcane_power.remains>variable.totm_max_delay)|cooldown.arcane_power.remains<=gcd))
+    frost_nova,if=runeforge.grisly_icicle.equipped&cooldown.arcane_power.remains=0&(!talent.enlightened.enabled|(talent.enlightened.enabled&mana.pct>=70))&((cooldown.touch_of_the_magi.remains>10&buff.arcane_charge.stack=buff.arcane_charge.max_stack)|(cooldown.touch_of_the_magi.remains=0&buff.arcane_charge.stack=0))&buff.rune_of_power.down&mana.pct>=variable.ap_minimum_mana_pct
+    frostbolt,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_frost.down&(buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down)&cooldown.touch_of_the_magi.remains=0&(buff.arcane_charge.stack<=2&((talent.rune_of_power.enabled&cooldown.rune_of_power.remains<=gcd&cooldown.arcane_power.remains>variable.totm_max_delay)|(!talent.rune_of_power.enabled&cooldown.arcane_power.remains>variable.totm_max_delay)|cooldown.arcane_power.remains<=gcd))
+    fire_blast,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_fire.down&prev_gcd.1.frostbolt
+    mirrors_of_torment,if=cooldown.touch_of_the_magi.remains=0&buff.arcane_charge.stack<=2&cooldown.arcane_power.remains<=gcd
+    mirrors_of_torment,if=cooldown.arcane_power.remains=0&(!talent.enlightened.enabled|(talent.enlightened.enabled&mana.pct>=70))&((cooldown.touch_of_the_magi.remains>variable.ap_max_delay&buff.arcane_charge.stack=buff.arcane_charge.max_stack)|(cooldown.touch_of_the_magi.remains=0&buff.arcane_charge.stack=0))&buff.rune_of_power.down&mana.pct>=variable.ap_minimum_mana_pct
+    deathborne,if=cooldown.touch_of_the_magi.remains=0&buff.arcane_charge.stack<=2&cooldown.arcane_power.remains<=gcd
+    deathborne,if=cooldown.arcane_power.remains=0&(!talent.enlightened.enabled|(talent.enlightened.enabled&mana.pct>=70))&((cooldown.touch_of_the_magi.remains>10&buff.arcane_charge.stack=buff.arcane_charge.max_stack)|(cooldown.touch_of_the_magi.remains=0&buff.arcane_charge.stack=0))&buff.rune_of_power.down&mana.pct>=variable.ap_minimum_mana_pct
+    radiant_spark,if=cooldown.touch_of_the_magi.remains>variable.rs_max_delay&cooldown.arcane_power.remains>variable.rs_max_delay&(talent.rune_of_power.enabled&cooldown.rune_of_power.remains<=gcd|talent.rune_of_power.enabled&cooldown.rune_of_power.remains>variable.rs_max_delay|!talent.rune_of_power.enabled)&buff.arcane_charge.stack>2&debuff.touch_of_the_magi.down
+    radiant_spark,if=cooldown.touch_of_the_magi.remains=0&buff.arcane_charge.stack<=2&cooldown.arcane_power.remains<=gcd
+    radiant_spark,if=cooldown.arcane_power.remains=0&((!talent.enlightened.enabled|(talent.enlightened.enabled&mana.pct>=70))&((cooldown.touch_of_the_magi.remains>variable.ap_max_delay&buff.arcane_charge.stack=buff.arcane_charge.max_stack)|(cooldown.touch_of_the_magi.remains=0&buff.arcane_charge.stack=0))&buff.rune_of_power.down&mana.pct>=variable.ap_minimum_mana_pct)
+    touch_of_the_magi,if=buff.arcane_charge.stack<=2&talent.rune_of_power.enabled&cooldown.rune_of_power.remains<=gcd&cooldown.arcane_power.remains>variable.totm_max_delay
+    touch_of_the_magi,if=buff.arcane_charge.stack<=2&!talent.rune_of_power.enabled&cooldown.arcane_power.remains>variable.totm_max_delay
+    touch_of_the_magi,if=buff.arcane_charge.stack<=2&cooldown.arcane_power.remains<=gcd
+    arcane_power,if=(!talent.enlightened.enabled|(talent.enlightened.enabled&mana.pct>=70))&cooldown.touch_of_the_magi.remains>variable.ap_max_delay&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&mana.pct>=variable.ap_minimum_mana_pct
+    rune_of_power,if=buff.rune_of_power.down&cooldown.touch_of_the_magi.remains>variable.rop_max_delay&buff.arcane_charge.stack=buff.arcane_charge.max_stack&(cooldown.arcane_power.remains>15|debuff.touch_of_the_magi.up)
+    presence_of_mind,if=debuff.touch_of_the_magi.up&debuff.touch_of_the_magi.remains<=buff.presence_of_mind.max_stack*action.arcane_blast.execute_time
+    use_mana_gem,if=cooldown.evocation.remains>0&((talent.enlightened.enabled&mana.pct<=80&mana.pct>=65)|(!talent.enlightened.enabled&mana.pct<=85))
+  Priorities (actions.rotation):
+    variable,name=final_burn,op=set,value=1,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&!buff.rule_of_threes.up&target.time_to_die<=((mana%action.arcane_blast.cost)*action.arcane_blast.execute_time)
+    arcane_blast,if=dot.radiant_spark.remains>5|debuff.radiant_spark_vulnerability.stack>0
+    arcane_blast,if=buff.presence_of_mind.up&debuff.touch_of_the_magi.up&debuff.touch_of_the_magi.remains<=action.arcane_blast.execute_time
+    arcane_missiles,if=debuff.touch_of_the_magi.up&talent.arcane_echo.enabled,chain=1
+    arcane_missiles,if=buff.clearcasting.react&buff.expanded_potential.up
+    arcane_missiles,if=buff.clearcasting.react&(buff.arcane_power.up|buff.rune_of_power.up|debuff.touch_of_the_magi.remains>action.arcane_missiles.execute_time),chain=1
+    arcane_missiles,if=buff.clearcasting.react&buff.clearcasting.stack=buff.clearcasting.max_stack,chain=1
+    arcane_missiles,if=buff.clearcasting.react&buff.clearcasting.remains<=((buff.clearcasting.stack*action.arcane_missiles.execute_time)+gcd),chain=1
+    nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.arcane_power.down&debuff.touch_of_the_magi.down
+    arcane_orb,if=buff.arcane_charge.stack<=2/supernova,if=mana.pct<=95/shifting_power,if=cooldown.evocation.remains>0
+    arcane_blast,if=buff.rule_of_threes.up&buff.arcane_charge.stack>3
+    arcane_barrage,if=cooldown.touch_of_the_magi.remains=0&(cooldown.rune_of_power.remains=0|cooldown.arcane_power.remains=0)&buff.arcane_charge.stack=buff.arcane_charge.max_stack
+    arcane_barrage,if=mana.pct<=variable.barrage_mana_pct&buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down&buff.arcane_charge.stack=buff.arcane_charge.max_stack&cooldown.evocation.remains>0
+    arcane_barrage,if=buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down&buff.arcane_charge.stack=buff.arcane_charge.max_stack&talent.arcane_orb.enabled&cooldown.arcane_orb.remains<=gcd&mana.pct<=90&cooldown.evocation.remains>0
+    arcane_barrage,if=buff.arcane_power.up&buff.arcane_power.remains<=gcd&buff.arcane_charge.stack=buff.arcane_charge.max_stack
+    arcane_barrage,if=buff.rune_of_power.up&buff.rune_of_power.remains<=gcd&buff.arcane_charge.stack=buff.arcane_charge.max_stack/arcane_blast
+    evocation,interrupt_if=mana.pct>=85,interrupt_immediate=1/arcane_barrage
+  Priorities (actions.final_burn):
+    arcane_missiles,if=buff.clearcasting.react,chain=1/arcane_blast/arcane_barrage
+  Actions:
+    arcane_barrage               Count=  17.8| 15.868sec  DPE= 8551| 6.83%  DPET= 6831  DPR=  0  pDPS= 506  Miss= 0.00%  Hit=  7004|  4802| 11864  Crit= 13908|  9604| 23728|22.47%
+    arcane_blast                 Count=  89.8|  3.241sec  DPE= 8214|33.16%  DPET= 6198  DPR=  1  pDPS=2463  Miss= 0.00%  Hit=  6736|  1418| 11918  Crit= 13415|  2835| 23837|22.13%
+    arcane_echo                  Count= 153.0|  2.142sec  DPE=  742| 5.10%  DPET=    0  DPR=  0  pDPS= 378  Miss= 0.00%  Hit=   608|   339|   711  Crit=  1213|   677|  1423|22.19%
+    arcane_missiles              Count=  46.1|  6.480sec  DPE=20335|42.08%  DPET=10897  DPR=  9  pDPS=3123  TickCount=   306  MissTick= 0.00%  Tick=  2507|  1572|  3302  CritTick=  5017|  3144|  6603|22.23%  UpTime= 26.83%
+    arcane_orb                   Count=  10.9| 26.168sec  DPE= 5403| 0.00%  DPET= 4351  DPR= 11  pDPS=   0
+    arcane_orb_bolt              Count=  10.9| 26.167sec  DPE= 5404| 2.65%  DPET=    0  DPR=  0  pDPS= 197  Miss= 0.00%  Hit=  4410|  4239|  5935  Crit=  8807|  8478| 11870|22.60%
+    arcane_power                 Count=   3.5| 98.749sec  DPE=    0| 0.00%  DPET=    0  DPR=  0  pDPS=   0
+    berserking                   Count=   2.0|197.665sec  DPE=    0| 0.00%  DPET=    0  DPR=  0  pDPS=   0
+    counterspell                 Count=  13.6| 22.723sec  DPE=    0| 0.00%  DPET=    0  DPR=  0  pDPS=   0
+    evocation                    Count=   3.3| 94.850sec  DPE=    0| 0.00%  DPET=    0  DPR=  0  pDPS=   0  TickCount=    20  UpTime=  4.31%
+    frostbolt                    Count=   0.0|  0.000sec  DPE=    0| 0.09%  DPET=    0  DPR=  2  pDPS=   7  Miss= 0.00%  Hit=  1585|  1585|  1585  Crit=  3170|  3170|  3170|21.69%
+    mirror_image                 Count=   1.0|  0.000sec  DPE= 6877| 0.00%  DPET=    0  DPR=  0  pDPS=   0
+    presence_of_mind             Count=   1.0|185.207sec  DPE=    0| 0.00%  DPET=    0  DPR=  0  pDPS=   0
+    rune_of_power                Count=   6.4| 48.036sec  DPE=    0| 0.00%  DPET=    0  DPR=  0  pDPS=   0
+    shifting_power               Count=   5.8| 47.860sec  DPE= 9532| 2.50%  DPET= 1861  DPR=  4  pDPS= 185  TickCount=    23  MissTick= 0.00%  Tick=  1963|  1859|  3909  CritTick=  3918|  3719|  7817|21.94%  UpTime=  9.46%
+    touch_of_the_magi            Count=   6.5| 49.153sec  DPE=24949| 0.00%  DPET=19593  DPR= 10  pDPS=   0
+    touch_of_the_magi_explosion  Count=   6.5| 49.071sec  DPE=24949| 7.29%  DPET=    0  DPR=  0  pDPS= 541  Miss= 0.00%  Hit= 24994|  1003| 51394
+    use_mana_gem                 Count=   2.8|131.644sec  DPE=    0| 0.00%  DPET=    0  DPR=  0  pDPS=   0
+   mirror_image (DPS=171.9202524526725)
+    frostbolt                    Count=  93.0|  1.262sec  DPE=   74| 0.31%  DPET=   58  DPR=  0  pDPS= 172  Miss= 0.00%  Hit=    61|    46|    64  Crit=   121|    92|   129|22.16%
+
+  Constant Buffs:
+    arcane_intellect/battle_shout/power_word_fortitude
+  Dynamic Buffs:
+    arcane_charge    : start= 18.7 refresh= 99.5 interval= 16.0 trigger=  2.5 duration= 13.8 uptime= 86.27%
+    arcane_power     : start=  3.5 refresh=  0.0 interval= 98.6 trigger= 98.6 duration= 14.8 uptime= 17.33%
+    berserking       : start=  2.0 refresh=  0.0 interval=197.3 trigger=197.3 duration= 12.0 uptime=  8.11%  benefit= 28.57%
+    bloodlust        : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 40.0 uptime= 13.51%
+    clearcasting     : start= 20.7 refresh=  5.3 interval= 14.3 trigger= 11.3 duration=  4.7 uptime= 32.50%
+    evocation        : start=  3.3 refresh=  0.0 interval= 95.0 trigger= 95.0 duration=  3.9 uptime=  4.32%
+    presence_of_mind : start=  1.0 refresh=  0.0 interval=198.8 trigger=198.8 duration=  3.9 uptime=  1.37%  benefit=  3.53%
+    rune_of_power    : start=  9.9 refresh=  0.0 interval= 31.6 trigger= 31.6 duration= 14.7 uptime= 48.31%
+  Benefits:
+      0.08% : Arcane Barrage Arcane Charge 3
+     99.92% : Arcane Barrage Arcane Charge 4
+      4.05% : Arcane Blast Arcane Charge 0  
+      2.66% : Arcane Blast Arcane Charge 1  
+     12.27% : Arcane Blast Arcane Charge 2  
+     12.81% : Arcane Blast Arcane Charge 3  
+     68.20% : Arcane Blast Arcane Charge 4  
+  Up-Times:
+      0.71% : Mana Cap                      
+    100.00% : Conserve Phase                
+  Gains:
+    383953.8 : mana_regen     (mana)           (overflow=1.59%)
+    165041.2 : Evocation      (mana)         
+     17908.1 : Mana Gem       (mana)         
+     46103.6 : Arcane Barrage (mana)         
+    Pet "mirror_image" Gains:
+  Waiting:  0.00%
+
+
+ *** Targets *** 
+
+Target: Fluffy_Pillow humanoid enemy unknown 63
+  DTPS=7422.251391788413 DTPS-Error=14.46594458916929/0.19% DTPS-Range=1060.2146360419997/14.28%
+  DPR=0.0 RPS-Out=6829.166378915086 RPS-In=0.0 Resource=health Waiting=0.0 ApM=0.0
+  Talents: 0000000
+  Core Stats:    strength=0|0(0)  agility=0|0(0)  stamina=0|0(0)  intellect=0|0(0)  spirit=0|0(0)  health=0|1921401  mana=0|0
+  Generic Stats: mastery=0.00%|0.00%(0)  versatility=0.00%|0.00%(0)  leech=0.00%|0.00%(0)  runspeed=7.00%|7.00%(0)
+  Spell Stats:   power=0|0(0)  hit=0.00%|0.00%(0)  crit=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%  manareg=0|0(0)
+  Attack Stats:  power=0|0(0)  hit=0.00%|0.00%(0)  crit=5.00%|5.00%(0)  expertise=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%
+  Defense Stats: armor=1071|1071(1071) miss=3.00%|3.00%  dodge=3.00%|3.00%(0)  parry=3.00%|3.00%(0)  block=3.00%|3.00%(0) crit=0.00%|0.00%  versatility=0.00%|0.00%(0)
+  Priorities (actions.precombat):
+    snapshot_stats
+  Priorities (actions.default):
+
+  Actions:
+
+  Constant Buffs:
+    arcane_intellect/battle_shout/bleeding/chaos_brand/mortal_wounds/mystic_touch/power_word_fortitude
+  Dynamic Buffs:
+    Health Decade (0 - 10)   : start=  0.8 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 59.6 uptime= 14.38%
+    Health Decade (10 - 20)  : start=  0.9 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 28.3 uptime=  8.65%
+    Health Decade (20 - 30)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 30.5 uptime= 10.23%
+    Health Decade (30 - 40)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 30.7 uptime= 10.35%
+    Health Decade (40 - 50)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 34.6 uptime= 11.68%
+    Health Decade (50 - 60)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 30.2 uptime= 10.21%
+    Health Decade (60 - 70)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.7 uptime= 11.06%
+    Health Decade (70 - 80)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 35.3 uptime= 11.93%
+    Health Decade (80 - 90)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 22.5 uptime=  7.61%
+    Health Decade (90 - 100) : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 12.2 uptime=  3.91%
+    touch_of_the_magi        : start=  6.5 refresh=  0.0 interval= 49.2 trigger= 49.2 duration=  7.9 uptime= 17.18%
+  Waiting:  0.00%
+
+
+Profilesets (median Damage per Second):
+      8844.213 : RWTiring/NTPoison/NSplendor/GInvigor/DotG:10/AProdigy:10/MBrand:10/GSurge:10
+      8843.527 : RWTiring/NTPoison/SPatrol/GInvigor/DotG:10/AProdigy:10/MBrand:10/GSurge:10
+      8776.783 : RWTiring/NTPoison/NSplendor/GInvigor/AProdigy:10/MBrand:10/NPrecision:10/GSurge:10
+      8763.489 : RWTiring/NTPoison/SPatrol/GInvigor/AProdigy:10/MBrand:10/NPrecision:10/GSurge:10
+      8734.409 : RWTiring/NTPoison/SPatrol/GInvigor/DotG:10/AProdigy:10/NPrecision:10/GSurge:10
+      8723.834 : RWTiring/NTPoison/NSplendor/GInvigor/DotG:10/AProdigy:10/NPrecision:10/GSurge:10
+      8678.421 : RWTiring/NTPoison/SPatrol/GInvigor/AProdigy:10/AotArchmage:10/MBrand:10/GSurge:10
+      8658.666 : RWTiring/NTPoison/NSplendor/GInvigor/AProdigy:10/AotArchmage:10/MBrand:10/GSurge:10
+      8654.400 : SotMove/NTPoison/SPatrol/GInvigor/AProdigy:10/MBrand:10/GSurge:10
+      8628.723 : RWTiring/NTPoison/SPatrol/GInvigor/DotG:10/AProdigy:10/AotArchmage:10/GSurge:10
+      8612.686 : SotMove/NTPoison/NSplendor/GInvigor/AProdigy:10/MBrand:10/GSurge:10
+      8606.097 : RWTiring/NTPoison/NSplendor/GInvigor/DotG:10/AProdigy:10/AotArchmage:10/GSurge:10
+      8569.970 : SotMove/NTPoison/SPatrol/GInvigor/DotG:10/AProdigy:10/GSurge:10
+      8567.247 : RWTiring/NTPoison/SPatrol/GInvigor/AProdigy:10/AotArchmage:10/NPrecision:10/GSurge:10
+      8563.735 : RWTiring/NTPoison/NSplendor/GInvigor/AProdigy:10/AotArchmage:10/NPrecision:10/GSurge:10
+      8553.896 : SotMove/NTPoison/NSplendor/GInvigor/DotG:10/AProdigy:10/GSurge:10
+      8518.430 : SotMove/NTPoison/NSplendor/GInvigor/AProdigy:10/NPrecision:10/GSurge:10
+      8510.894 : SotMove/NTPoison/SPatrol/GInvigor/AProdigy:10/NPrecision:10/GSurge:10
+      8443.653 : SotMove/NTPoison/NSplendor/GInvigor/AProdigy:10/AotArchmage:10/GSurge:10
+      8394.405 : SotMove/NTPoison/SPatrol/GInvigor/AProdigy:10/AotArchmage:10/GSurge:10
+      8371.280 : RWTiring/NTBurs/SPatrol/GInvigor/AProdigy:10/MBrand:10/GSurge:10
+      8364.999 : RWTiring/NTBurs/NSplendor/GInvigor/AProdigy:10/MBrand:10/GSurge:10
+      8305.068 : RWTiring/NTBurs/NSplendor/GInvigor/DotG:10/AProdigy:10/GSurge:10
+      8287.652 : RWTiring/NTBurs/SPatrol/GInvigor/DotG:10/AProdigy:10/GSurge:10
+      8276.603 : RWTiring/NTHerbs/SPatrol/GInvigor/AProdigy:10/MBrand:10/GSurge:10
+      8260.356 : RWTiring/NTPoison/SPatrol/GInvigor/DotG:10/MBrand:10/NPrecision:10/GSurge:10
+      8256.564 : RWTiring/NTHerbs/NSplendor/GInvigor/AProdigy:10/MBrand:10/GSurge:10
+      8254.414 : RWTiring/NTPoison/NSplendor/GInvigor/DotG:10/MBrand:10/NPrecision:10/GSurge:10
+      8250.255 : RWTiring/NTBurs/NSplendor/GInvigor/AProdigy:10/NPrecision:10/GSurge:10
+      8240.517 : RWTiring/NTBurs/SPatrol/GInvigor/AProdigy:10/NPrecision:10/GSurge:10
+      8208.491 : RWTiring/NTHerbs/NSplendor/GInvigor/DotG:10/AProdigy:10/GSurge:10
+      8195.316 : RWTiring/NTPoison/SPatrol/GInvigor/AotArchmage:10/MBrand:10/NPrecision:10/GSurge:10
+      8190.352 : RWTiring/NTPoison/NSplendor/GInvigor/AotArchmage:10/MBrand:10/NPrecision:10/GSurge:10
+      8180.333 : RWTiring/NTHerbs/SPatrol/GInvigor/DotG:10/AProdigy:10/GSurge:10
+      8161.059 : RWTiring/NTPoison/SPatrol/GInvigor/DotG:10/AotArchmage:10/MBrand:10/GSurge:10
+      8159.410 : RWTiring/NTPoison/NSplendor/GInvigor/DotG:10/AotArchmage:10/MBrand:10/GSurge:10
+      8155.377 : SotMove/NTPoison/SPatrol/GInvigor/MBrand:10/NPrecision:10/GSurge:10
+      8148.270 : RWTiring/NTBurs/NSplendor/GInvigor/AProdigy:10/AotArchmage:10/GSurge:10
+      8147.111 : SotMove/NTPoison/NSplendor/GInvigor/MBrand:10/NPrecision:10/GSurge:10
+      8141.285 : RWTiring/NTBurs/SPatrol/GInvigor/AProdigy:10/AotArchmage:10/GSurge:10
+      8140.144 : RWTiring/NTHerbs/NSplendor/GInvigor/AProdigy:10/NPrecision:10/GSurge:10
+      8138.932 : RWTiring/NTHerbs/SPatrol/GInvigor/AProdigy:10/NPrecision:10/GSurge:10
+      8118.386 : SotMove/NTPoison/SPatrol/GInvigor/DotG:10/MBrand:10/GSurge:10
+      8106.951 : SotMove/NTBurs/NSplendor/GInvigor/AProdigy:10/GSurge:10
+      8101.986 : SotMove/NTPoison/NSplendor/GInvigor/DotG:10/MBrand:10/GSurge:10
+      8092.035 : SotMove/NTBurs/SPatrol/GInvigor/AProdigy:10/GSurge:10
+      8059.400 : RWTiring/NTHerbs/NSplendor/GInvigor/AProdigy:10/AotArchmage:10/GSurge:10
+      8058.639 : RWTiring/NTHerbs/SPatrol/GInvigor/AProdigy:10/AotArchmage:10/GSurge:10
+      8051.366 : RWTiring/NTPoison/NSplendor/GInvigor/DotG:10/AotArchmage:10/NPrecision:10/GSurge:10
+      8050.952 : RWTiring/NTPoison/SPatrol/GInvigor/DotG:10/AotArchmage:10/NPrecision:10/GSurge:10
+      8047.665 : SotMove/NTPoison/SPatrol/GInvigor/AotArchmage:10/MBrand:10/GSurge:10
+      8047.093 : SotMove/NTPoison/NSplendor/GInvigor/AotArchmage:10/MBrand:10/GSurge:10
+      8031.306 : SotMove/NTPoison/NSplendor/GInvigor/DotG:10/NPrecision:10/GSurge:10
+      8016.977 : SotMove/NTPoison/SPatrol/GInvigor/DotG:10/NPrecision:10/GSurge:10
+      8015.537 : SotMove/NTHerbs/NSplendor/GInvigor/AProdigy:10/GSurge:10
+      8001.615 : SotMove/NTHerbs/SPatrol/GInvigor/AProdigy:10/GSurge:10
+      7947.619 : SotMove/NTPoison/NSplendor/GInvigor/AotArchmage:10/NPrecision:10/GSurge:10
+      7943.419 : SotMove/NTPoison/SPatrol/GInvigor/AotArchmage:10/NPrecision:10/GSurge:10
+      7923.429 : SotMove/NTPoison/NSplendor/GInvigor/DotG:10/AotArchmage:10/GSurge:10
+      7919.280 : SotMove/NTPoison/SPatrol/GInvigor/DotG:10/AotArchmage:10/GSurge:10
+      7892.940 : RWTiring/NTBurs/NSplendor/GInvigor/MBrand:10/NPrecision:10/GSurge:10
+      7890.936 : RWTiring/NTBurs/SPatrol/GInvigor/MBrand:10/NPrecision:10/GSurge:10
+      7846.861 : RWTiring/NTBurs/SPatrol/GInvigor/DotG:10/MBrand:10/GSurge:10
+      7830.493 : RWTiring/NTBurs/NSplendor/GInvigor/DotG:10/MBrand:10/GSurge:10
+      7798.442 : RWTiring/NTHerbs/NSplendor/GInvigor/MBrand:10/NPrecision:10/GSurge:10
+      7797.783 : RWTiring/NTBurs/NSplendor/GInvigor/AotArchmage:10/MBrand:10/GSurge:10
+      7794.796 : RWTiring/NTHerbs/SPatrol/GInvigor/MBrand:10/NPrecision:10/GSurge:10
+      7785.433 : RWTiring/NTBurs/SPatrol/GInvigor/AotArchmage:10/MBrand:10/GSurge:10
+      7777.963 : RWTiring/NTHerbs/SPatrol/GInvigor/DotG:10/MBrand:10/GSurge:10
+      7761.136 : RWTiring/NTHerbs/NSplendor/GInvigor/DotG:10/MBrand:10/GSurge:10
+      7758.396 : SotMove/NTBurs/SPatrol/GInvigor/MBrand:10/GSurge:10
+      7755.363 : RWTiring/NTBurs/SPatrol/GInvigor/DotG:10/NPrecision:10/GSurge:10
+      7751.759 : RWTiring/NTBurs/NSplendor/GInvigor/DotG:10/NPrecision:10/GSurge:10
+      7745.431 : SotMove/NTBurs/NSplendor/GInvigor/MBrand:10/GSurge:10
+      7720.007 : RWTiring/NTHerbs/SPatrol/GInvigor/AotArchmage:10/MBrand:10/GSurge:10
+      7714.928 : RWTiring/NTHerbs/NSplendor/GInvigor/AotArchmage:10/MBrand:10/GSurge:10
+      7685.444 : RWTiring/NTBurs/SPatrol/GInvigor/AotArchmage:10/NPrecision:10/GSurge:10
+      7666.443 : SotMove/NTBurs/NSplendor/GInvigor/NPrecision:10/GSurge:10
+      7662.481 : RWTiring/NTBurs/NSplendor/GInvigor/DotG:10/AotArchmage:10/GSurge:10
+      7662.062 : RWTiring/NTHerbs/SPatrol/GInvigor/DotG:10/NPrecision:10/GSurge:10
+      7661.042 : RWTiring/NTBurs/NSplendor/GInvigor/AotArchmage:10/NPrecision:10/GSurge:10
+      7657.562 : SotMove/NTHerbs/NSplendor/GInvigor/MBrand:10/GSurge:10
+      7657.206 : RWTiring/NTHerbs/NSplendor/GInvigor/DotG:10/NPrecision:10/GSurge:10
+      7654.548 : RWTiring/NTBurs/SPatrol/GInvigor/DotG:10/AotArchmage:10/GSurge:10
+      7646.331 : SotMove/NTBurs/SPatrol/GInvigor/NPrecision:10/GSurge:10
+      7643.391 : SotMove/NTHerbs/SPatrol/GInvigor/MBrand:10/GSurge:10
+      7618.604 : SotMove/NTBurs/NSplendor/GInvigor/DotG:10/GSurge:10
+      7602.667 : SotMove/NTBurs/SPatrol/GInvigor/DotG:10/GSurge:10
+      7591.443 : RWTiring/NTHerbs/SPatrol/GInvigor/AotArchmage:10/NPrecision:10/GSurge:10
+      7578.465 : RWTiring/NTHerbs/NSplendor/GInvigor/AotArchmage:10/NPrecision:10/GSurge:10
+      7566.105 : SotMove/NTHerbs/NSplendor/GInvigor/NPrecision:10/GSurge:10
+      7558.590 : SotMove/NTBurs/SPatrol/GInvigor/AotArchmage:10/GSurge:10
+      7554.124 : RWTiring/NTHerbs/NSplendor/GInvigor/DotG:10/AotArchmage:10/GSurge:10
+      7552.067 : RWTiring/NTHerbs/SPatrol/GInvigor/DotG:10/AotArchmage:10/GSurge:10
+      7548.486 : SotMove/NTHerbs/SPatrol/GInvigor/NPrecision:10/GSurge:10
+      7543.746 : SotMove/NTBurs/NSplendor/GInvigor/AotArchmage:10/GSurge:10
+      7519.628 : SotMove/NTHerbs/NSplendor/GInvigor/DotG:10/GSurge:10
+      7513.166 : SotMove/NTHerbs/SPatrol/GInvigor/DotG:10/GSurge:10
+      7448.123 : SotMove/NTHerbs/NSplendor/GInvigor/AotArchmage:10/GSurge:10
+      7446.731 : SotMove/NTHerbs/SPatrol/GInvigor/AotArchmage:10/GSurge:10
+
+
+Baseline Performance:
+  No-Networking = true
+  RNG Engine    = xoshiro256+
+  Iterations    = 1710 (422, 427, 431, 430)
+  TotalEvents   = 517821218
+  MaxEventQueue = 34
+  TargetHealth  = 1921402
+  SimSeconds    = 512092.100
+  CpuSeconds    = 275.875
+  WallSeconds   = 69.3156764
+  InitSeconds   = 0.8319808000000001
+  MergeSeconds  = 0.056407900000000004
+  AnalyzeSeconds= 0.07407380000000001
+  SpeedUp       = 1861
+  EndTime       = 2020-09-15 23:25:33-0400 (1600226733)
+
+
+Waiting:
+    All players active 100% of the time.
+
