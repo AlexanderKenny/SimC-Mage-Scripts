@@ -1,0 +1,440 @@
+
+ * Beta! Beta! Beta! Beta! Beta! Beta! 
+ * Not All classes are yet supported. 
+ * Some class models still need tweaking. 
+ * Some class action lists need tweaking. 
+ * Some class BiS gear setups need tweaking. 
+ * Some trinkets not yet implemented. 
+ * Constructive feedback regarding our output will shorten the Beta phase dramatically. 
+ * Beta! Beta! Beta! Beta! Beta! Beta! 
+
+DPS Ranking:
+  11876 100.0%  Raid
+  11876  100.0%  fire
+
+HPS Ranking:
+      0 100.0%%  Raid
+
+Player: fire troll mage fire 60
+  DPS=11875.656619279986 DPS-Error=22.353801525326304/0.19% DPS-Range=958.3118335428926/8.07%
+  DPR=15.218839453593247 RPS-Out=775.7737581443255 RPS-In=771.0389827134887 Resource=mana Waiting=0.0 ApM=50.2236028884032
+  Talents: 3032023
+  Covenant: kyrian
+  Core Stats:    strength=199|199(199)  agility=308|308(308)  stamina=434|414(414)  intellect=2569|2447(2447)  spirit=0|0(0)  health=8680|8280  mana=50000|50000
+  Generic Stats: mastery=18.86%|18.86%(600)  versatility=15.00%|15.00%(600)  leech=0.00%|0.00%(0)  runspeed=7.00%|7.00%(0)
+  Spell Stats:   power=2569|2447(0)  hit=15.00%|15.00%(0)  crit=38.86%|38.86%(660)  haste=18.18%|18.18%(600)  speed=18.18%|18.18%  manareg=1000|1000(0)
+  Attack Stats:  power=0|0(0)  hit=7.50%|7.50%(0)  crit=23.86%|23.86%(660)  expertise=7.50%|7.50%(0)  haste=18.18%|18.18%(600)  speed=18.18%|18.18%
+  Defense Stats: armor=0|0(0) miss=3.00%|3.00%  dodge=3.00%|3.00%(0)  parry=0.00%|0.00%(0)  block=0.00%|0.00%(0) crit=0.00%|0.00%  versatility=7.50%|7.50%(600)
+  Priorities (actions.precombat):
+    flask/food/augmentation/arcane_intellect/variable,name=disable_combustion,op=reset
+    variable,name=hot_streak_flamestrike,op=set,if=variable.hot_streak_flamestrike=0,value=2*talent.flame_patch.enabled+3*!talent.flame_patch.enabled
+    variable,name=hard_cast_flamestrike,op=set,if=variable.hard_cast_flamestrike=0,value=2*talent.flame_patch.enabled+99*!talent.flame_patch.enabled
+    variable,name=delay_flamestrike,default=0,op=reset/variable,name=kindling_reduction,default=0.2,op=reset
+    variable,name=shifting_power_reduction,op=set,value=action.shifting_power.cast_time%action.shifting_power.tick_time*3,if=covenant.night_fae.enabled
+    snapshot_stats/mirror_image/potion/pyroblast
+  Priorities (actions.default):
+    counterspell,if=!runeforge.disciplinary_command.equipped
+    shifting_power,if=buff.combustion.down&buff.rune_of_power.down&cooldown.combustion.remains>0&(cooldown.rune_of_power.remains>0|!talent.rune_of_power.enabled)
+    radiant_spark,if=(buff.combustion.down&buff.rune_of_power.down&(cooldown.combustion.remains<execute_time|cooldown.combustion.remains>cooldown.radiant_spark.duration))|(buff.rune_of_power.up&cooldown.combustion.remains>30)
+    deathborne,if=buff.combustion.down&buff.rune_of_power.down&cooldown.combustion.remains<execute_time
+    variable,name=time_to_combustion,op=set,value=talent.firestarter.enabled*firestarter.remains+(cooldown.combustion.remains*(1-variable.kindling_reduction*talent.kindling.enabled))*!cooldown.combustion.ready*buff.combustion.down
+    mirror_image,if=buff.combustion.down&debuff.radiant_spark_vulnerability.down
+    counterspell,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_arcane.down&cooldown.combustion.remains>30&!buff.disciplinary_command.up
+    arcane_explosion,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_arcane.down&cooldown.combustion.remains>30&!buff.disciplinary_command.up
+    frostbolt,if=runeforge.disciplinary_command.equipped&cooldown.buff_disciplinary_command.ready&buff.disciplinary_command_frost.down&cooldown.combustion.remains>30&!buff.disciplinary_command.up
+    rune_of_power,if=buff.rune_of_power.down&(variable.time_to_combustion>buff.rune_of_power.duration&variable.time_to_combustion>action.fire_blast.full_recharge_time|variable.time_to_combustion>target.time_to_die|variable.disable_combustion)
+    call_action_list,name=combustion_phase,if=!variable.disable_combustion&variable.time_to_combustion<=0
+    variable,name=fire_blast_pooling,value=!variable.disable_combustion&variable.time_to_combustion<action.fire_blast.full_recharge_time-variable.shifting_power_reduction*(cooldown.shifting_power.remains<variable.time_to_combustion)&variable.time_to_combustion<target.time_to_die|runeforge.sun_kings_blessing.equipped&action.fire_blast.charges_fractional<action.fire_blast.max_charges-0.5&(cooldown.shifting_power.remains>15|!covenant.night_fae.enabled)
+    call_action_list,name=rop_phase,if=buff.rune_of_power.up&(variable.time_to_combustion>0|variable.disable_combustion)
+    variable,name=phoenix_pooling,value=!variable.disable_combustion&variable.time_to_combustion<action.phoenix_flames.full_recharge_time&variable.time_to_combustion<target.time_to_die
+    fire_blast,use_off_gcd=1,use_while_casting=1,if=!variable.fire_blast_pooling&(variable.time_to_combustion>0|variable.disable_combustion)&(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&buff.hot_streak.down
+    fire_blast,use_off_gcd=1,use_while_casting=1,if=firestarter.active&charges>=1&!variable.fire_blast_pooling&(!action.fireball.executing&!action.pyroblast.in_flight&buff.heating_up.up|action.fireball.executing&buff.hot_streak.down|action.pyroblast.in_flight&buff.heating_up.down&buff.hot_streak.down)
+    call_action_list,name=standard_rotation,if=variable.time_to_combustion>0|variable.disable_combustion
+  Priorities (actions.combustion_phase):
+    lights_judgment,if=buff.combustion.down
+    variable,name=extended_combustion_remains,op=set,value=buff.combustion.remains+buff.combustion.duration*(cooldown.combustion.remains<buff.combustion.remains)
+    variable,name=extended_combustion_remains,op=add,value=6,if=buff.sun_kings_blessing_ready.up|variable.extended_combustion_remains>1.5*gcd.max*(buff.sun_kings_blessing.max_stack-buff.sun_kings_blessing.stack)
+    bag_of_tricks,if=buff.combustion.down/living_bomb,if=active_enemies>1&buff.combustion.down
+    mirrors_of_torment,if=buff.combustion.down&buff.rune_of_power.down
+    pyroblast,if=buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing.remains>cast_time&buff.combustion.down
+    fire_blast,use_off_gcd=1,use_while_casting=1,if=conduit.infernal_cascade.enabled&charges>=1&((action.fire_blast.charges_fractional+(variable.extended_combustion_remains-buff.infernal_cascade.duration)%cooldown.fire_blast.duration-variable.extended_combustion_remains%(buff.infernal_cascade.duration-0.5))>=0|variable.extended_combustion_remains<=buff.infernal_cascade.duration|buff.infernal_cascade.remains<0.5)&buff.combustion.up&buff.hot_streak.down&hot_streak_spells_in_flight+buff.heating_up.up<2
+    fire_blast,use_off_gcd=1,use_while_casting=1,if=!conduit.infernal_cascade.enabled&charges>=1&buff.combustion.up&buff.hot_streak.down&hot_streak_spells_in_flight+buff.heating_up.up<2
+    counterspell,if=runeforge.disciplinary_command.equipped&buff.disciplinary_command.down&buff.disciplinary_command_arcane.down&cooldown.buff_disciplinary_command.ready
+    arcane_explosion,if=runeforge.disciplinary_command.equipped&buff.disciplinary_command.down&buff.disciplinary_command_arcane.down&cooldown.buff_disciplinary_command.ready
+    frostbolt,if=runeforge.disciplinary_command.equipped&buff.disciplinary_command.down&buff.disciplinary_command_frost.down
+    call_action_list,name=active_talents
+    combustion,use_off_gcd=1,use_while_casting=1,if=(buff.combustion.down|!runeforge.sun_kings_blessing.equipped)&runeforge.disciplinary_command.equipped&buff.disciplinary_command.up&((action.meteor.in_flight&action.meteor.in_flight_remains<=0.5)|!talent.meteor.enabled&(essence.memory_of_lucid_dreams.major|buff.hot_streak.react|action.scorch.executing&action.scorch.execute_remains<0.5|action.pyroblast.executing&action.pyroblast.execute_remains<0.5)|action.pyroblast.execute_remains<0.5&buff.sun_kings_blessing_ready.up)
+    combustion,use_off_gcd=1,use_while_casting=1,if=(buff.combustion.down|!runeforge.sun_kings_blessing.equipped)&!runeforge.disciplinary_command.equipped&((action.meteor.in_flight&action.meteor.in_flight_remains<=0.5)|!talent.meteor.enabled&(essence.memory_of_lucid_dreams.major|buff.hot_streak.react|action.scorch.executing&action.scorch.execute_remains<0.5|action.pyroblast.executing&action.pyroblast.execute_remains<0.5)|action.pyroblast.execute_remains<0.5&buff.sun_kings_blessing_ready.up)
+    potion,if=buff.combustion.last_expire<=action.combustion.last_used/blood_fury,if=buff.combustion.last_expire<=action.combustion.last_used
+    berserking,if=buff.combustion.last_expire<=action.combustion.last_used/fireblood,if=buff.combustion.last_expire<=action.combustion.last_used
+    ancestral_call,if=buff.combustion.last_expire<=action.combustion.last_used
+    use_items,if=buff.combustion.last_expire<=action.combustion.last_used
+    flamestrike,if=((talent.flame_patch.enabled&active_enemies>2)|active_enemies>6)&buff.hot_streak.react
+    pyroblast,if=buff.sun_kings_blessing_ready.up/pyroblast,if=buff.firestorm.react
+    pyroblast,if=buff.pyroclasm.react&buff.combustion.remains>cast_time/pyroblast,if=buff.hot_streak.react
+    pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up
+    phoenix_flames,if=buff.combustion.up&buff.hot_streak.down&hot_streak_spells_in_flight+buff.heating_up.up<2
+    scorch,if=buff.combustion.remains>cast_time&buff.combustion.up|buff.combustion.down&cooldown.combustion.remains<cast_time
+    living_bomb,if=buff.combustion.remains<gcd.max&active_enemies>1/dragons_breath,if=buff.combustion.remains<gcd.max&buff.combustion.up
+    scorch,if=target.health.pct<=30&talent.searing_touch.enabled
+  Priorities (actions.rop_phase):
+    flamestrike,if=(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&buff.hot_streak.react
+    pyroblast,if=buff.sun_kings_blessing_ready.up&(buff.sun_kings_blessing.remains<execute_time+3|buff.rune_of_power.remains-6<execute_time+3|action.fire_blast.full_recharge_time<execute_time)
+    pyroblast,if=buff.firestorm.react/pyroblast,if=buff.hot_streak.react
+    fire_blast,use_off_gcd=1,use_while_casting=1,if=buff.sun_kings_blessing_ready.down&!(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&(!buff.heating_up.react&!buff.hot_streak.react&!prev_off_gcd.fire_blast&(action.fire_blast.charges>=2|(talent.alexstraszas_fury.enabled&cooldown.dragons_breath.ready)|(talent.searing_touch.enabled&target.health.pct<=30)))
+    call_action_list,name=active_talents/pyroblast,if=buff.pyroclasm.react&cast_time<buff.pyroclasm.remains&buff.rune_of_power.remains>cast_time
+    fire_blast,use_off_gcd=1,use_while_casting=1,if=buff.sun_kings_blessing_ready.down&!(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&(buff.heating_up.react&(target.health.pct>=30|!talent.searing_touch.enabled))
+    fire_blast,use_off_gcd=1,use_while_casting=1,if=buff.sun_kings_blessing_ready.down&!(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.heating_up.react&!buff.hot_streak.react)
+    pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up&talent.searing_touch.enabled&target.health.pct<=30&!(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
+    phoenix_flames,if=!variable.phoenix_pooling&buff.heating_up.down&buff.hot_streak.down
+    scorch,if=target.health.pct<=30&talent.searing_touch.enabled/dragons_breath,if=active_enemies>2
+    flamestrike,if=(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
+    fireball
+  Priorities (actions.standard_rotation):
+    flamestrike,if=(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&buff.hot_streak.react
+    pyroblast,if=buff.firestorm.react/pyroblast,if=buff.hot_streak.react&buff.hot_streak.remains<action.fireball.execute_time
+    pyroblast,if=buff.hot_streak.react&(prev_gcd.1.fireball|firestarter.active|action.pyroblast.in_flight)
+    pyroblast,if=buff.sun_kings_blessing_ready.up&(cooldown.rune_of_power.remains+action.rune_of_power.execute_time>buff.sun_kings_blessing_ready.remains+cast_time|!talent.rune_of_power.enabled)&variable.time_to_combustion>buff.sun_kings_blessing_ready.remains+cast_time
+    pyroblast,if=buff.hot_streak.react&target.health.pct<=30&talent.searing_touch.enabled
+    pyroblast,if=buff.pyroclasm.react&cast_time<buff.pyroclasm.remains
+    fire_blast,use_off_gcd=1,use_while_casting=1,if=!firestarter.active&!variable.fire_blast_pooling&(((action.fireball.executing|action.pyroblast.executing)&buff.heating_up.react)|(talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.hot_streak.react&!buff.heating_up.react&action.scorch.executing&!hot_streak_spells_in_flight)))
+    pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up&talent.searing_touch.enabled&target.health.pct<=30&!(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
+    phoenix_flames,if=!variable.phoenix_pooling&(!talent.from_the_ashes.enabled|active_enemies>1)/call_action_list,name=active_talents
+    dragons_breath,if=active_enemies>1/scorch,if=target.health.pct<=30&talent.searing_touch.enabled
+    flamestrike,if=active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion)
+    fireball/scorch
+  Priorities (actions.active_talents):
+    living_bomb,if=active_enemies>1&buff.combustion.down&(variable.time_to_combustion>cooldown.living_bomb.duration|variable.time_to_combustion<=0|variable.disable_combustion)
+    meteor,if=!variable.disable_combustion&variable.time_to_combustion<=0|(cooldown.meteor.duration<variable.time_to_combustion&!talent.rune_of_power.enabled)|talent.rune_of_power.enabled&buff.rune_of_power.up&variable.time_to_combustion>action.meteor.cooldown|target.time_to_die<variable.time_to_combustion|variable.disable_combustion
+    dragons_breath,if=talent.alexstraszas_fury.enabled&(buff.combustion.down&!buff.hot_streak.react)
+  Actions:
+    berserking              Count=   2.0|243.916sec  DPE=    0| 0.00%  DPET=    0  DPR=   0  pDPS=   0
+    combustion              Count=   3.0|122.119sec  DPE=    0| 0.00%  DPET=    0  DPR=   0  pDPS=   0
+    conflagration           Count=  66.4|  2.962sec  DPE=  139| 0.26%  DPET=    0  DPR=   0  pDPS=  31  TickCount=   119  MissTick= 0.00%  Tick=    54|     0|    67  CritTick=   110|     0|   135|42.17%  UpTime= 64.37%
+    conflagration_flare_up  Count= 145.5|  2.373sec  DPE= 1683| 6.88%  DPET=    0  DPR=   0  pDPS= 816  Miss= 0.00%  Hit=   223|   197|   276  Crit=   471|   394|   551|45.85%
+    dragons_breath          Count=  14.7| 20.183sec  DPE=25352|10.47%  DPET=20692  DPR=  13  pDPS=1241  Miss= 0.00%  Crit=  5071|  4246|  8323|100.00%
+    fire_blast              Count=  32.1|  9.423sec  DPE= 5306| 4.78%  DPET=    0  DPR=  11  pDPS= 568  Miss= 0.00%  Crit=  5306|  4199|  8230|100.00%
+    fireball                Count=  66.4|  2.962sec  DPE= 3503| 6.27%  DPET= 1921  DPR=   4  pDPS= 743  Miss= 0.00%  Hit=  2283|  1978|  3878  Crit=  4562|  3957|  7756|47.42%
+    flamestrike             Count=  45.3|  6.366sec  DPE=17294|22.02%  DPET=13947  DPR=  14  pDPS=2611  Miss= 0.00%  Hit=  2487|  1928|  5102  Crit=  4982|  3856| 10204|38.95%
+    ignite                  Count= 477.3|  0.677sec  DPE= 1893|25.37%  DPET=    0  DPR=   0  pDPS=3013  TickCount=  1448  MissTick= 0.00%  Tick=   624|    32|  3348  UpTime=482.64%
+    meteor                  Count=   5.8| 58.556sec  DPE=39526| 0.00%  DPET=32332  DPR=  79  pDPS=   0
+    meteor_burn             Count=  44.6|  6.445sec  DPE= 2823| 3.53%  DPET=    0  DPR=   0  pDPS= 420  MissTick= 0.00%  Tick=   316|   241|   472  CritTick=   665|   481|   943|71.12%
+    meteor_impact           Count=   5.7| 58.757sec  DPE=17785| 2.86%  DPET=    0  DPR=   0  pDPS= 340  Miss= 0.00%  Hit=  1989|  1516|  2972  Crit=  4243|  3033|  5944|70.54%
+    mirror_image            Count=   3.0|120.466sec  DPE= 5823| 0.00%  DPET= 6871  DPR=   9  pDPS=   0
+    phoenix_flames          Count=  14.2| 21.450sec  DPE=17185| 0.00%  DPET=14947  DPR=   0  pDPS=   0
+    phoenix_flames_splash   Count=  14.2| 21.440sec  DPE=17232| 6.88%  DPET=    0  DPR=   0  pDPS= 819  Miss= 0.00%  Hit=  1575|  1174|  4041  Crit=  4022|  2347| 10287|76.48%
+    pyroblast               Count=  19.0| 13.933sec  DPE=11703| 5.80%  DPET=10752  DPR=  11  pDPS= 694  Miss= 0.00%  Hit=  3616|  3613|  5058  Crit= 10547|  7226| 17754|96.97%
+    pyroblast_dot           Count=  19.0| 13.933sec  DPE=  844| 0.45%  DPET=    0  DPR=   0  pDPS=  54  TickCount=    38  MissTick= 0.00%  Tick=   217|    44|   253  CritTick=   491|    89|   506|74.45%  UpTime= 18.17%
+    radiant_spark           Count=   8.1| 39.235sec  DPE= 5775| 1.32%  DPET= 4667  DPR=   6  pDPS= 156  Miss= 0.00%  Hit=  2509|  2216|  3103  Crit=  5019|  4432|  6205|39.32%  TickCount=    45  MissTick= 0.00%  Tick=   236|    25|   302  CritTick=   521|     1|   604|62.10%  UpTime= 21.28%
+    rune_of_power           Count=   5.3| 59.228sec  DPE=    0| 0.00%  DPET=    0  DPR=   0  pDPS=   0
+    scorch                  Count=  32.9|  9.043sec  DPE= 2841| 2.62%  DPET= 2279  DPR=   6  pDPS= 312  Miss= 0.00%  Crit=  2841|  1445|  5058|100.00%
+   mirror_image (DPS=153.76631712228638)
+    frostbolt               Count= 221.6|  3.730sec  DPE=   79| 0.49%  DPET=   52  DPR=   0  pDPS= 154  Miss= 0.00%  Hit=    57|    43|    61  Crit=   113|    87|   121|39.04%
+
+  Constant Buffs:
+    arcane_intellect/battle_shout/power_word_fortitude
+  Dynamic Buffs:
+    alexstraszas_fury : start= 14.7 refresh=  0.0 interval= 20.2 trigger= 20.2 duration=  2.8 uptime= 13.86%
+    berserking        : start=  2.0 refresh=  0.0 interval=243.9 trigger=243.9 duration= 11.7 uptime=  7.72%  benefit= 21.99%
+    bloodlust         : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 40.0 uptime= 13.50%
+    combustion        : start=  3.0 refresh=  0.0 interval=122.1 trigger=122.1 duration= 11.8 uptime= 11.77%
+    fireball          : start= 19.9 refresh= 15.0 interval= 10.0 trigger=  5.6 duration=  5.4 uptime= 35.55%
+    heating_up        : start= 72.3 refresh=  0.0 interval=  4.2 trigger=  4.2 duration=  1.4 uptime= 33.01%  benefit= 47.08%
+    hot_streak        : start= 64.6 refresh=  0.0 interval=  4.6 trigger=  4.6 duration=  1.0 uptime= 19.71%  benefit= 98.46%
+    rune_of_power     : start=  8.2 refresh=  0.0 interval= 38.3 trigger= 38.3 duration= 14.6 uptime= 40.13%
+  Up-Times:
+     11.96% : Mana Cap                      
+  Procs:
+     72.25106 |   4.16346sec : Heating Up generated
+      7.21560 |  27.92027sec : Heating Up removed
+     21.74752 |  13.42768sec : Heating Up converted with Fire Blast
+     64.61277 |   4.64404sec : Hot Streak procs
+    180.21277 |   1.66683sec : Hot Streak spells used
+    141.43262 |   2.12345sec : Hot Streak spell crits
+      4.56879 |  54.33783sec : Hot Streak spell crits wasted
+     18.32766 |  40.68561sec : Direct Ignite applications
+      3.99716 | 111.65188sec : Ignites spread to new targets
+     52.81986 |  23.04029sec : Ignites spread to targets with existing Ignite
+  Gains:
+    231344.1 : mana_regen (mana)           (overflow=22.79%)
+    Pet "mirror_image" Gains:
+  Waiting:  0.00%
+
+
+ *** Targets *** 
+
+Target: e1 humanoid enemy unknown 63
+  DTPS=4930.64017948787 DTPS-Error=10.303275686948197/0.21% DTPS-Range=376.4032611055791/7.63%
+  DPR=0.0 RPS-Out=4643.248716240021 RPS-In=0.0 Resource=health Waiting=0.0 ApM=0.0
+  Talents: 0000000
+  Core Stats:    strength=0|0(0)  agility=0|0(0)  stamina=0|0(0)  intellect=0|0(0)  spirit=0|0(0)  health=0|1755243  mana=0|0
+  Generic Stats: mastery=0.00%|0.00%(0)  versatility=0.00%|0.00%(0)  leech=0.00%|0.00%(0)  runspeed=7.00%|7.00%(0)
+  Spell Stats:   power=0|0(0)  hit=0.00%|0.00%(0)  crit=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%  manareg=0|0(0)
+  Attack Stats:  power=0|0(0)  hit=0.00%|0.00%(0)  crit=5.00%|5.00%(0)  expertise=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%
+  Defense Stats: armor=1071|1071(1071) miss=3.00%|3.00%  dodge=3.00%|3.00%(0)  parry=3.00%|3.00%(0)  block=3.00%|3.00%(0) crit=0.00%|0.00%  versatility=0.00%|0.00%(0)
+  Priorities (actions.precombat):
+    snapshot_stats
+  Priorities (actions.default):
+
+  Actions:
+
+  Constant Buffs:
+    arcane_intellect/battle_shout/bleeding/chaos_brand/mortal_wounds/mystic_touch/power_word_fortitude
+  Dynamic Buffs:
+    Health Decade (0 - 10)      : start=  0.7 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 46.2 uptime= 10.32%
+    Health Decade (10 - 20)     : start=  0.9 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 26.4 uptime=  7.80%
+    Health Decade (20 - 30)     : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 29.6 uptime=  9.78%
+    Health Decade (30 - 40)     : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 38.3 uptime= 12.90%
+    Health Decade (40 - 50)     : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 33.1 uptime= 11.18%
+    Health Decade (50 - 60)     : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 27.5 uptime=  9.27%
+    Health Decade (60 - 70)     : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 40.9 uptime= 13.80%
+    Health Decade (70 - 80)     : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 39.8 uptime= 13.46%
+    Health Decade (80 - 90)     : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 22.7 uptime=  7.67%
+    Health Decade (90 - 100)    : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 13.0 uptime=  3.83%
+    radiant_spark_vulnerability : start=  8.1 refresh= 24.0 interval= 39.2 trigger=  9.0 duration=  4.3 uptime= 11.62%
+  Waiting:  0.00%
+
+Target: e2 humanoid enemy unknown 63
+  DTPS=1735.3747529560806 DTPS-Error=4.268909308238241/0.25% DTPS-Range=195.95423316132747/11.29%
+  DPR=0.0 RPS-Out=1626.3284595375997 RPS-In=0.0 Resource=health Waiting=0.0 ApM=0.0
+  Talents: 0000000
+  Core Stats:    strength=0|0(0)  agility=0|0(0)  stamina=0|0(0)  intellect=0|0(0)  spirit=0|0(0)  health=0|568619  mana=0|0
+  Generic Stats: mastery=0.00%|0.00%(0)  versatility=0.00%|0.00%(0)  leech=0.00%|0.00%(0)  runspeed=7.00%|7.00%(0)
+  Spell Stats:   power=0|0(0)  hit=0.00%|0.00%(0)  crit=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%  manareg=0|0(0)
+  Attack Stats:  power=0|0(0)  hit=0.00%|0.00%(0)  crit=5.00%|5.00%(0)  expertise=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%
+  Defense Stats: armor=1071|1071(1071) miss=3.00%|3.00%  dodge=3.00%|3.00%(0)  parry=3.00%|3.00%(0)  block=3.00%|3.00%(0) crit=0.00%|0.00%  versatility=0.00%|0.00%(0)
+  Priorities (actions.precombat):
+    snapshot_stats
+  Priorities (actions.default):
+
+  Actions:
+
+  Constant Buffs:
+    arcane_intellect/battle_shout/bleeding/chaos_brand/mortal_wounds/mystic_touch/power_word_fortitude
+  Dynamic Buffs:
+    Health Decade (0 - 10)   : start=  0.7 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 41.5 uptime=  9.23%
+    Health Decade (10 - 20)  : start=  0.9 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 23.3 uptime=  6.64%
+    Health Decade (20 - 30)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 26.3 uptime=  8.56%
+    Health Decade (30 - 40)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 34.5 uptime= 11.57%
+    Health Decade (40 - 50)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 34.2 uptime= 11.46%
+    Health Decade (50 - 60)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 29.2 uptime=  9.88%
+    Health Decade (60 - 70)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 38.1 uptime= 12.85%
+    Health Decade (70 - 80)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 39.9 uptime= 13.49%
+    Health Decade (80 - 90)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.6 uptime= 10.69%
+    Health Decade (90 - 100) : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 18.3 uptime=  5.64%
+  Waiting:  0.00%
+
+Target: e3 humanoid enemy unknown 63
+  DTPS=1736.7905351829145 DTPS-Error=4.252220825387683/0.24% DTPS-Range=192.58953211531423/11.09%
+  DPR=0.0 RPS-Out=1628.6272513362326 RPS-In=0.0 Resource=health Waiting=0.0 ApM=0.0
+  Talents: 0000000
+  Core Stats:    strength=0|0(0)  agility=0|0(0)  stamina=0|0(0)  intellect=0|0(0)  spirit=0|0(0)  health=0|556128  mana=0|0
+  Generic Stats: mastery=0.00%|0.00%(0)  versatility=0.00%|0.00%(0)  leech=0.00%|0.00%(0)  runspeed=7.00%|7.00%(0)
+  Spell Stats:   power=0|0(0)  hit=0.00%|0.00%(0)  crit=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%  manareg=0|0(0)
+  Attack Stats:  power=0|0(0)  hit=0.00%|0.00%(0)  crit=5.00%|5.00%(0)  expertise=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%
+  Defense Stats: armor=1071|1071(1071) miss=3.00%|3.00%  dodge=3.00%|3.00%(0)  parry=3.00%|3.00%(0)  block=3.00%|3.00%(0) crit=0.00%|0.00%  versatility=0.00%|0.00%(0)
+  Priorities (actions.precombat):
+    snapshot_stats
+  Priorities (actions.default):
+
+  Actions:
+
+  Constant Buffs:
+    arcane_intellect/battle_shout/bleeding/chaos_brand/mortal_wounds/mystic_touch/power_word_fortitude
+  Dynamic Buffs:
+    Health Decade (0 - 10)   : start=  0.7 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 41.7 uptime=  9.24%
+    Health Decade (10 - 20)  : start=  0.9 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 23.5 uptime=  6.80%
+    Health Decade (20 - 30)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 26.3 uptime=  8.65%
+    Health Decade (30 - 40)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 33.8 uptime= 11.33%
+    Health Decade (40 - 50)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 34.0 uptime= 11.38%
+    Health Decade (50 - 60)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 29.8 uptime= 10.08%
+    Health Decade (60 - 70)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 38.1 uptime= 12.85%
+    Health Decade (70 - 80)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 39.5 uptime= 13.33%
+    Health Decade (80 - 90)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.7 uptime= 10.67%
+    Health Decade (90 - 100) : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 18.4 uptime=  5.66%
+  Waiting:  0.00%
+
+Target: e4 humanoid enemy unknown 63
+  DTPS=1736.125377545891 DTPS-Error=4.317747722362541/0.25% DTPS-Range=204.11136764136825/11.76%
+  DPR=0.0 RPS-Out=1634.4602556490502 RPS-In=0.0 Resource=health Waiting=0.0 ApM=0.0
+  Talents: 0000000
+  Core Stats:    strength=0|0(0)  agility=0|0(0)  stamina=0|0(0)  intellect=0|0(0)  spirit=0|0(0)  health=0|513652  mana=0|0
+  Generic Stats: mastery=0.00%|0.00%(0)  versatility=0.00%|0.00%(0)  leech=0.00%|0.00%(0)  runspeed=7.00%|7.00%(0)
+  Spell Stats:   power=0|0(0)  hit=0.00%|0.00%(0)  crit=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%  manareg=0|0(0)
+  Attack Stats:  power=0|0(0)  hit=0.00%|0.00%(0)  crit=5.00%|5.00%(0)  expertise=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%
+  Defense Stats: armor=1071|1071(1071) miss=3.00%|3.00%  dodge=3.00%|3.00%(0)  parry=3.00%|3.00%(0)  block=3.00%|3.00%(0) crit=0.00%|0.00%  versatility=0.00%|0.00%(0)
+  Priorities (actions.precombat):
+    snapshot_stats
+  Priorities (actions.default):
+
+  Actions:
+
+  Constant Buffs:
+    arcane_intellect/battle_shout/bleeding/chaos_brand/mortal_wounds/mystic_touch/power_word_fortitude
+  Dynamic Buffs:
+    Health Decade (0 - 10)   : start=  0.7 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 41.0 uptime=  8.89%
+    Health Decade (10 - 20)  : start=  0.9 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 22.6 uptime=  6.51%
+    Health Decade (20 - 30)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 26.5 uptime=  8.61%
+    Health Decade (30 - 40)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 34.2 uptime= 11.45%
+    Health Decade (40 - 50)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 34.6 uptime= 11.60%
+    Health Decade (50 - 60)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 29.7 uptime= 10.01%
+    Health Decade (60 - 70)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 38.5 uptime= 12.98%
+    Health Decade (70 - 80)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 39.7 uptime= 13.42%
+    Health Decade (80 - 90)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.2 uptime= 10.85%
+    Health Decade (90 - 100) : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 18.4 uptime=  5.69%
+  Waiting:  0.00%
+
+Target: e5 humanoid enemy unknown 63
+  DTPS=1736.7257741072337 DTPS-Error=4.328460675388104/0.25% DTPS-Range=201.14720549045865/11.58%
+  DPR=0.0 RPS-Out=1625.6827154805042 RPS-In=0.0 Resource=health Waiting=0.0 ApM=0.0
+  Talents: 0000000
+  Core Stats:    strength=0|0(0)  agility=0|0(0)  stamina=0|0(0)  intellect=0|0(0)  spirit=0|0(0)  health=0|487072  mana=0|0
+  Generic Stats: mastery=0.00%|0.00%(0)  versatility=0.00%|0.00%(0)  leech=0.00%|0.00%(0)  runspeed=7.00%|7.00%(0)
+  Spell Stats:   power=0|0(0)  hit=0.00%|0.00%(0)  crit=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%  manareg=0|0(0)
+  Attack Stats:  power=0|0(0)  hit=0.00%|0.00%(0)  crit=5.00%|5.00%(0)  expertise=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%
+  Defense Stats: armor=1071|1071(1071) miss=3.00%|3.00%  dodge=3.00%|3.00%(0)  parry=3.00%|3.00%(0)  block=3.00%|3.00%(0) crit=0.00%|0.00%  versatility=0.00%|0.00%(0)
+  Priorities (actions.precombat):
+    snapshot_stats
+  Priorities (actions.default):
+
+  Actions:
+
+  Constant Buffs:
+    arcane_intellect/battle_shout/bleeding/chaos_brand/mortal_wounds/mystic_touch/power_word_fortitude
+  Dynamic Buffs:
+    Health Decade (0 - 10)   : start=  0.7 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 43.6 uptime=  9.42%
+    Health Decade (10 - 20)  : start=  0.9 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 22.6 uptime=  6.46%
+    Health Decade (20 - 30)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 26.6 uptime=  8.61%
+    Health Decade (30 - 40)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 34.1 uptime= 11.41%
+    Health Decade (40 - 50)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 34.2 uptime= 11.48%
+    Health Decade (50 - 60)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 29.6 uptime= 10.01%
+    Health Decade (60 - 70)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 38.4 uptime= 12.96%
+    Health Decade (70 - 80)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 39.3 uptime= 13.28%
+    Health Decade (80 - 90)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.7 uptime= 10.72%
+    Health Decade (90 - 100) : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 18.3 uptime=  5.66%
+  Waiting:  0.00%
+
+
+Profilesets (median Damage per Second):
+     12727.083 : Mentor/PCourage/EForward/VStrikes/FAccretion:5/MFlame:5/GSurge:5
+     12722.530 : Mentor/PCourage/CRites/VStrikes/FAccretion:5/MFlame:5/GSurge:5
+     12715.155 : Mentor/PCourage/EForward/VStrikes/MFlame:5/ICascade:5/GSurge:5
+     12677.072 : Mentor/PCourage/CRites/VStrikes/MFlame:5/ICascade:5/GSurge:5
+     12672.765 : Mentor/PCourage/CRites/VStrikes/CDest:5/MFlame:5/GSurge:5
+     12660.641 : Mentor/PCourage/EForward/VStrikes/CDest:5/MFlame:5/GSurge:5
+     12636.471 : Mentor/RAAccolade/CRites/VStrikes/FAccretion:5/MFlame:5/ICascade:5
+     12620.776 : Mentor/RAAccolade/EForward/VStrikes/FAccretion:5/MFlame:5/ICascade:5
+     12617.088 : Mentor/RAAccolade/CRites/VStrikes/CDest:5/FAccretion:5/MFlame:5
+     12604.393 : Mentor/RAAccolade/EForward/VStrikes/CDest:5/FAccretion:5/MFlame:5
+     12585.149 : Mentor/PCourage/EForward/VStrikes/IoAsc:5/MFlame:5/GSurge:5
+     12565.964 : Mentor/RAAccolade/CRites/VStrikes/CDest:5/MFlame:5/ICascade:5
+     12549.596 : Mentor/RAAccolade/EForward/VStrikes/CDest:5/MFlame:5/ICascade:5
+     12537.324 : Mentor/PCourage/CRites/VStrikes/IoAsc:5/MFlame:5/GSurge:5
+     12533.357 : AscPhial/PCourage/EForward/VStrikes/MFlame:5/GSurge:5
+     12532.716 : Mentor/PCourage/EForward/VStrikes/FAccretion:5/ICascade:5/GSurge:5
+     12530.784 : Mentor/PCourage/CRites/VStrikes/FAccretion:5/ICascade:5/GSurge:5
+     12514.533 : Mentor/PCourage/CRites/VStrikes/CDest:5/FAccretion:5/GSurge:5
+     12508.470 : AscPhial/PCourage/CRites/VStrikes/MFlame:5/GSurge:5
+     12504.299 : Mentor/PCourage/EForward/VStrikes/CDest:5/FAccretion:5/GSurge:5
+     12503.997 : Mentor/RAAccolade/CRites/VStrikes/IoAsc:5/FAccretion:5/MFlame:5
+     12490.152 : Mentor/RAAccolade/EForward/VStrikes/IoAsc:5/FAccretion:5/MFlame:5
+     12472.934 : Mentor/PCourage/CRites/VStrikes/CDest:5/ICascade:5/GSurge:5
+     12471.418 : Mentor/PCourage/EForward/VStrikes/CDest:5/ICascade:5/GSurge:5
+     12466.350 : Mentor/RAAccolade/CRites/VStrikes/IoAsc:5/MFlame:5/ICascade:5
+     12453.823 : Mentor/RAAccolade/EForward/VStrikes/CDest:5/FAccretion:5/ICascade:5
+     12453.148 : Mentor/BPursuit/EForward/VStrikes/FAccretion:5/MFlame:5
+     12437.035 : Mentor/RAAccolade/EForward/VStrikes/IoAsc:5/MFlame:5/ICascade:5
+     12435.417 : Mentor/BPursuit/CRites/VStrikes/FAccretion:5/MFlame:5
+     12427.963 : Mentor/RAAccolade/CRites/VStrikes/CDest:5/FAccretion:5/ICascade:5
+     12427.576 : AscPhial/RAAccolade/CRites/VStrikes/FAccretion:5/MFlame:5/GSurge:5
+     12423.764 : Mentor/RAAccolade/EForward/VStrikes/IoAsc:5/CDest:5/MFlame:5
+     12418.693 : AscPhial/RAAccolade/EForward/VStrikes/FAccretion:5/MFlame:5/GSurge:5
+     12404.719 : Mentor/RAAccolade/CRites/VStrikes/IoAsc:5/CDest:5/MFlame:5
+     12397.044 : Mentor/PCourage/EForward/VStrikes/IoAsc:5/FAccretion:5/GSurge:5
+     12384.636 : Mentor/PCourage/CRites/VStrikes/IoAsc:5/CDest:5/GSurge:5
+     12382.967 : Mentor/BPursuit/EForward/VStrikes/MFlame:5/ICascade:5
+     12379.515 : AscPhial/RAAccolade/EForward/VStrikes/MFlame:5/ICascade:5/GSurge:5
+     12379.344 : Mentor/PCourage/CRites/VStrikes/IoAsc:5/FAccretion:5/GSurge:5
+     12376.201 : AscPhial/RAAccolade/CRites/VStrikes/MFlame:5/ICascade:5/GSurge:5
+     12371.641 : Mentor/BPursuit/CRites/VStrikes/MFlame:5/ICascade:5
+     12370.718 : AscPhial/PCourage/EForward/VStrikes/FAccretion:5/GSurge:5
+     12369.506 : Mentor/PCourage/EForward/VStrikes/IoAsc:5/ICascade:5/GSurge:5
+     12364.289 : AscPhial/RAAccolade/CRites/VStrikes/CDest:5/MFlame:5/GSurge:5
+     12361.776 : Mentor/BPursuit/CRites/VStrikes/CDest:5/MFlame:5
+     12357.936 : Mentor/PCourage/CRites/VStrikes/IoAsc:5/ICascade:5/GSurge:5
+     12350.205 : AscPhial/RAAccolade/EForward/VStrikes/CDest:5/MFlame:5/GSurge:5
+     12348.082 : Mentor/BPursuit/EForward/VStrikes/CDest:5/MFlame:5
+     12346.261 : AscPhial/PCourage/CRites/VStrikes/FAccretion:5/GSurge:5
+     12336.800 : AscPhial/PCourage/CRites/VStrikes/ICascade:5/GSurge:5
+     12330.546 : Mentor/RAAccolade/EForward/VStrikes/IoAsc:5/FAccretion:5/ICascade:5
+     12325.395 : Mentor/RAAccolade/CRites/VStrikes/IoAsc:5/FAccretion:5/ICascade:5
+     12315.720 : Mentor/PCourage/EForward/VStrikes/IoAsc:5/CDest:5/GSurge:5
+     12307.525 : AscPhial/PCourage/EForward/VStrikes/CDest:5/GSurge:5
+     12306.606 : Mentor/RAAccolade/CRites/VStrikes/IoAsc:5/CDest:5/FAccretion:5
+     12300.683 : Mentor/BPursuit/EForward/VStrikes/FAccretion:5/ICascade:5
+     12297.718 : AscPhial/PCourage/EForward/VStrikes/ICascade:5/GSurge:5
+     12291.582 : AscPhial/RAAccolade/EForward/VStrikes/FAccretion:5/ICascade:5/GSurge:5
+     12284.255 : Mentor/RAAccolade/EForward/VStrikes/IoAsc:5/CDest:5/FAccretion:5
+     12283.511 : AscPhial/RAAccolade/EForward/VStrikes/IoAsc:5/MFlame:5/GSurge:5
+     12274.753 : AscPhial/RAAccolade/CRites/VStrikes/IoAsc:5/MFlame:5/GSurge:5
+     12273.620 : AscPhial/RAAccolade/CRites/VStrikes/FAccretion:5/ICascade:5/GSurge:5
+     12272.308 : Mentor/BPursuit/CRites/VStrikes/FAccretion:5/ICascade:5
+     12270.384 : AscPhial/PCourage/CRites/VStrikes/CDest:5/GSurge:5
+     12264.467 : Mentor/RAAccolade/EForward/VStrikes/IoAsc:5/CDest:5/ICascade:5
+     12258.771 : AscPhial/RAAccolade/CRites/VStrikes/CDest:5/FAccretion:5/GSurge:5
+     12256.979 : Mentor/BPursuit/CRites/VStrikes/IoAsc:5/MFlame:5
+     12246.866 : Mentor/RAAccolade/CRites/VStrikes/IoAsc:5/CDest:5/ICascade:5
+     12243.615 : Mentor/BPursuit/EForward/VStrikes/CDest:5/FAccretion:5
+     12241.560 : Mentor/BPursuit/CRites/VStrikes/CDest:5/FAccretion:5
+     12233.462 : AscPhial/RAAccolade/EForward/VStrikes/CDest:5/FAccretion:5/GSurge:5
+     12230.983 : Mentor/BPursuit/EForward/VStrikes/IoAsc:5/MFlame:5
+     12221.824 : AscPhial/BPursuit/EForward/VStrikes/MFlame:5/GSurge:5
+     12203.008 : Mentor/BPursuit/CRites/VStrikes/CDest:5/ICascade:5
+     12202.765 : AscPhial/BPursuit/CRites/VStrikes/MFlame:5/GSurge:5
+     12181.365 : Mentor/BPursuit/EForward/VStrikes/CDest:5/ICascade:5
+     12179.965 : AscPhial/PCourage/CRites/VStrikes/IoAsc:5/GSurge:5
+     12171.520 : AscPhial/PCourage/EForward/VStrikes/IoAsc:5/GSurge:5
+     12168.811 : AscPhial/RAAccolade/CRites/VStrikes/CDest:5/ICascade:5/GSurge:5
+     12163.976 : AscPhial/RAAccolade/EForward/VStrikes/CDest:5/ICascade:5/GSurge:5
+     12145.483 : AscPhial/RAAccolade/CRites/VStrikes/IoAsc:5/FAccretion:5/GSurge:5
+     12140.034 : AscPhial/RAAccolade/EForward/VStrikes/IoAsc:5/FAccretion:5/GSurge:5
+     12132.576 : Mentor/BPursuit/CRites/VStrikes/IoAsc:5/FAccretion:5
+     12124.741 : Mentor/BPursuit/EForward/VStrikes/IoAsc:5/FAccretion:5
+     12099.652 : Mentor/BPursuit/EForward/VStrikes/IoAsc:5/ICascade:5
+     12095.781 : AscPhial/BPursuit/CRites/VStrikes/FAccretion:5/GSurge:5
+     12084.153 : AscPhial/RAAccolade/EForward/VStrikes/IoAsc:5/ICascade:5/GSurge:5
+     12083.837 : Mentor/BPursuit/CRites/VStrikes/IoAsc:5/ICascade:5
+     12075.316 : AscPhial/RAAccolade/CRites/VStrikes/IoAsc:5/ICascade:5/GSurge:5
+     12060.021 : AscPhial/BPursuit/EForward/VStrikes/FAccretion:5/GSurge:5
+     12055.092 : Mentor/BPursuit/EForward/VStrikes/IoAsc:5/CDest:5
+     12054.327 : AscPhial/RAAccolade/CRites/VStrikes/IoAsc:5/CDest:5/GSurge:5
+     12046.700 : Mentor/BPursuit/CRites/VStrikes/IoAsc:5/CDest:5
+     12041.524 : AscPhial/RAAccolade/EForward/VStrikes/IoAsc:5/CDest:5/GSurge:5
+     12033.031 : AscPhial/BPursuit/EForward/VStrikes/ICascade:5/GSurge:5
+     12006.407 : AscPhial/BPursuit/CRites/VStrikes/ICascade:5/GSurge:5
+     12004.045 : AscPhial/BPursuit/EForward/VStrikes/CDest:5/GSurge:5
+     11990.346 : AscPhial/BPursuit/CRites/VStrikes/CDest:5/GSurge:5
+     11900.482 : AscPhial/BPursuit/EForward/VStrikes/IoAsc:5/GSurge:5
+     11881.223 : AscPhial/BPursuit/CRites/VStrikes/IoAsc:5/GSurge:5
+
+
+Baseline Performance:
+  No-Networking = true
+  RNG Engine    = xoshiro256+
+  Iterations    = 709 (176, 176, 179, 178)
+  TotalEvents   = 419692726
+  MaxEventQueue = 94
+  TargetHealth  = 1755244
+  SimSeconds    = 211523.654
+  CpuSeconds    = 236.06250000000003
+  WallSeconds   = 59.529532200000006
+  InitSeconds   = 0.6004739
+  MergeSeconds  = 0.0843859
+  AnalyzeSeconds= 0.040714
+  SpeedUp       = 901
+  EndTime       = 2020-09-16 03:13:35-0400 (1600240415)
+
+
+Waiting:
+    All players active 100% of the time.
+
