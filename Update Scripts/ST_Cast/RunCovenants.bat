@@ -1,74 +1,39 @@
-@echo off
-SETLOCAL ENABLEDELAYEDEXPANSION
-for /R "D:\SimC Scripts\Dump\Input\Base" %%X IN (*.*) do (
-    SET spec=%%~nX
-    SET "ourDirectory=D:\SimC Scripts\Dump\Input\Cov\R1\!spec!"
-    SET "baseFile=%%X"
-    call :loopSoulbinds1 ourDirectory!, baseFile, spec
-)
-for /R "D:\SimC Scripts\Dump\Input\Base" %%X IN (*.*) do (
-    SET spec=%%~nX
-    SET "ourDirectory=D:\SimC Scripts\Dump\Input\Cov\R5\!spec!"
-    SET "baseFile=%%X"
-    call :loopSoulbinds5 ourDirectory!, baseFile, spec
-)
-for /R "D:\SimC Scripts\Dump\Input\Base" %%X IN (*.*) do (
-    SET spec=%%~nX
-    SET "ourDirectory=D:\SimC Scripts\Dump\Input\Cov\R10\!spec!"
-    SET "baseFile=%%X"
-    call :loopSoulbinds10 ourDirectory!, baseFile, spec
-)
-for /R "D:\SimC Scripts\Dump\Input\Base" %%X IN (*.*) do (
-    SET spec=%%~nX
-    SET "ourDirectory=D:\SimC Scripts\Dump\Input\Cov\R15\!spec!"
-    SET "baseFile=%%X"
-    call :loopSoulbinds15 ourDirectory!, baseFile, spec
-)
+@ECHO off
+CALL "..\simc.exe" "GenericOptions.simc" "..\..\Dump\Input\Base\Arcane.simc" "..\..\Dump\Input\Cov\R1\Arcane\Fae_Niya.simc"
+MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R1\Arcane_Fae_Niya.txt"
+MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R1\Arcane_Fae_Niya.json"
+CALL "..\simc.exe" "GenericOptions.simc" "..\..\Dump\Input\Base\Arcane.simc" "..\..\Dump\Input\Cov\R5\Arcane\Fae_Niya.simc"
+MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R5\Arcane_Fae_Niya.txt"
+MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R5\Arcane_Fae_Niya.json"
+CALL "..\simc.exe" "GenericOptions.simc" "..\..\Dump\Input\Base\Arcane.simc" "..\..\Dump\Input\Cov\R10\Arcane\Fae_Niya.simc"
+MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R10\Arcane_Fae_Niya.txt"
+MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R10\Arcane_Fae_Niya.json"
+CALL "..\simc.exe" "GenericOptions.simc" "..\..\Dump\Input\Base\Arcane.simc" "..\..\Dump\Input\Cov\R15\Arcane\Fae_Niya.simc"
+MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R15\Arcane_Fae_Niya.txt"
+MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R15\Arcane_Fae_Niya.json"
 
-:loopSoulbinds1
-set "specDirectory=!%1!"
-set "baseFile=!%2!"
-set "spec=!%3!"
-for /R "%specDirectory%" %%Y IN (*.*) do (
-    set soulbind=%%~nY
-    CALL "..\simc.exe" "GenericOptions.simc" "!baseFile!" "%%Y"
-    MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R1\!spec!_!soulbind!.txt"
-    MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R1\!spec!_!soulbind!.json"
-)
-exit /B 0
+CALL "..\simc.exe" "GenericOptions.simc" "..\..\Dump\Input\Base\Fire.simc" "..\..\Dump\Input\Cov\R1\Fire\Fae_Niya.simc"
+MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R1\Fire_Fae_Niya.txt"
+MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R1\Fire_Fae_Niya.json"
+CALL "..\simc.exe" "GenericOptions.simc" "..\..\Dump\Input\Base\Fire.simc" "..\..\Dump\Input\Cov\R5\Fire\Fae_Niya.simc"
+MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R5\Fire_Fae_Niya.txt"
+MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R5\Fire_Fae_Niya.json"
+CALL "..\simc.exe" "GenericOptions.simc" "..\..\Dump\Input\Base\Fire.simc" "..\..\Dump\Input\Cov\R10\Fire\Fae_Niya.simc"
+MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R10\Fire_Fae_Niya.txt"
+MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R10\Fire_Fae_Niya.json"
+CALL "..\simc.exe" "GenericOptions.simc" "..\..\Dump\Input\Base\Fire.simc" "..\..\Dump\Input\Cov\R15\Fire\Fae_Niya.simc"
+MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R15\Fire_Fae_Niya.txt"
+MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R15\Fire_Fae_Niya.json"
 
-:loopSoulbinds5
-set "specDirectory=!%1!"
-set "baseFile=!%2!"
-set "spec=!%3!"
-for /R "%specDirectory%" %%Y IN (*.*) do (
-    set soulbind=%%~nY
-    CALL "..\simc.exe" "GenericOptions.simc" "!baseFile!" "%%Y"
-    MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R5\!spec!_!soulbind!.txt"
-    MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R5\!spec!_!soulbind!.json"
-)
-exit /B 0
-
-:loopSoulbinds10
-set "specDirectory=!%1!"
-set "baseFile=!%2!"
-set "spec=!%3!"
-for /R "%specDirectory%" %%Y IN (*.*) do (
-    set soulbind=%%~nY
-    CALL "..\simc.exe" "GenericOptions.simc" "!baseFile!" "%%Y"
-    MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R10\!spec!_!soulbind!.txt"
-    MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R10\!spec!_!soulbind!.json"
-)
-exit /B 0
-
-:loopSoulbinds15
-set "specDirectory=!%1!"
-set "baseFile=!%2!"
-set "spec=!%3!"
-for /R "%specDirectory%" %%Y IN (*.*) do (
-    set soulbind=%%~nY
-    CALL "..\simc.exe" "GenericOptions.simc" "!baseFile!" "%%Y"
-    MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R15\!spec!_!soulbind!.txt"
-    MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R15\!spec!_!soulbind!.json"
-)
-exit /B 0
+CALL "..\simc.exe" "GenericOptions.simc" "..\..\Dump\Input\Base\Frost.simc" "..\..\Dump\Input\Cov\R1\Frost\Fae_Niya.simc"
+MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R1\Frost_Fae_Niya.txt"
+MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R1\Frost_Fae_Niya.json"
+CALL "..\simc.exe" "GenericOptions.simc" "..\..\Dump\Input\Base\Frost.simc" "..\..\Dump\Input\Cov\R5\Frost\Fae_Niya.simc"
+MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R5\Frost_Fae_Niya.txt"
+MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R5\Frost_Fae_Niya.json"
+CALL "..\simc.exe" "GenericOptions.simc" "..\..\Dump\Input\Base\Frost.simc" "..\..\Dump\Input\Cov\R10\Frost\Fae_Niya.simc"
+MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R10\Frost_Fae_Niya.txt"
+MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R10\Frost_Fae_Niya.json"
+CALL "..\simc.exe" "GenericOptions.simc" "..\..\Dump\Input\Base\Frost.simc" "..\..\Dump\Input\Cov\R15\Frost\Fae_Niya.simc"
+MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R15\Frost_Fae_Niya.txt"
+MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Cov\ST_Cast\R15\Frost_Fae_Niya.json"
