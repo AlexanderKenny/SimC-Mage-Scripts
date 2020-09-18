@@ -9,15 +9,15 @@
  * Beta! Beta! Beta! Beta! Beta! Beta! 
 
 DPS Ranking:
-  12606 100.0%  Raid
-  12606  100.0%  arcane
+  12734 100.0%  Raid
+  12734  100.0%  arcane
 
 HPS Ranking:
       0 100.0%%  Raid
 
 Player: arcane troll mage arcane 60
-  DPS=12605.82604081545 DPS-Error=21.175339854927685/0.17% DPS-Range=582.294033380319/4.62%
-  DPR=5.71023106288665 RPS-Out=2202.714128009964 RPS-In=2090.8559144641813 Resource=mana Waiting=0.0 ApM=46.336426056415526
+  DPS=12733.57636272132 DPS-Error=22.019008785683692/0.17% DPS-Range=588.0020896874948/4.62%
+  DPR=5.5603578674110965 RPS-Out=2284.8375938178033 RPS-In=2176.1353427353674 Resource=mana Waiting=0.0 ApM=47.71657879899562
   Talents: 0000000
   Covenant: night_fae
   Core Stats:    strength=199|199(199)  agility=308|308(308)  stamina=434|414(414)  intellect=2569|2447(2447)  spirit=0|0(0)  health=8680|8280  mana=65086|65086
@@ -39,6 +39,40 @@ Player: arcane troll mage arcane 60
     counterspell,if=target.debuff.casting.react/call_action_list,name=aoe,if=active_enemies>2
     call_action_list,name=opener,if=variable.have_opened=0/call_action_list,name=cooldowns/call_action_list,name=rotation,if=variable.final_burn=0
     call_action_list,name=final_burn,if=variable.final_burn=1/call_action_list,name=movement
+  Priorities (actions.opener):
+    variable,name=have_opened,op=set,value=1,if=prev_gcd.1.evocation
+    fire_blast,if=runeforge.disciplinary_command.equipped&buff.disciplinary_command_frost.up
+    frost_nova,if=runeforge.grisly_icicle.equipped&mana.pct>95/mirrors_of_torment/deathborne/radiant_spark,if=mana.pct>40/touch_of_the_magi
+    arcane_power/rune_of_power,if=buff.rune_of_power.down
+    use_mana_gem,if=(talent.enlightened.enabled&mana.pct<=80&mana.pct>=65)|(!talent.enlightened.enabled&mana.pct<=85)
+    berserking,if=buff.arcane_power.up/time_warp,if=runeforge.temporal_warp.equipped
+    presence_of_mind,if=debuff.touch_of_the_magi.up&debuff.touch_of_the_magi.remains<=buff.presence_of_mind.max_stack*action.arcane_blast.execute_time
+    arcane_blast,if=dot.radiant_spark.remains>5|debuff.radiant_spark_vulnerability.stack>0
+    arcane_blast,if=buff.presence_of_mind.up&debuff.touch_of_the_magi.up&debuff.touch_of_the_magi.remains<=action.arcane_blast.execute_time
+    arcane_barrage,if=buff.arcane_power.up&buff.arcane_power.remains<=gcd&buff.arcane_charge.stack=buff.arcane_charge.max_stack
+    supernova,if=mana.pct<=95/arcane_missiles,if=debuff.touch_of_the_magi.up&talent.arcane_echo.enabled,chain=1
+    arcane_missiles,if=buff.clearcasting.react,chain=1
+    arcane_orb,if=buff.arcane_charge.stack<=2&(cooldown.arcane_power.remains>10|active_enemies<=2)
+    arcane_blast,if=buff.rune_of_power.up|mana.pct>15/evocation,if=buff.rune_of_power.down,interrupt_if=mana.pct>=85,interrupt_immediate=1
+    arcane_barrage
+  Priorities (actions.rotation):
+    variable,name=final_burn,op=set,value=1,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&!buff.rule_of_threes.up&target.time_to_die<=((mana%action.arcane_blast.cost)*action.arcane_blast.execute_time)
+    arcane_blast,if=dot.radiant_spark.remains>5|debuff.radiant_spark_vulnerability.stack>0
+    arcane_blast,if=buff.presence_of_mind.up&debuff.touch_of_the_magi.up&debuff.touch_of_the_magi.remains<=action.arcane_blast.execute_time
+    arcane_missiles,if=debuff.touch_of_the_magi.up&talent.arcane_echo.enabled,chain=1
+    arcane_missiles,if=buff.clearcasting.react&buff.expanded_potential.up
+    arcane_missiles,if=buff.clearcasting.react&(buff.arcane_power.up|buff.rune_of_power.up|debuff.touch_of_the_magi.remains>action.arcane_missiles.execute_time),chain=1
+    arcane_missiles,if=buff.clearcasting.react&buff.clearcasting.stack=buff.clearcasting.max_stack,chain=1
+    arcane_missiles,if=buff.clearcasting.react&buff.clearcasting.remains<=((buff.clearcasting.stack*action.arcane_missiles.execute_time)+gcd),chain=1
+    nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.arcane_power.down&debuff.touch_of_the_magi.down
+    arcane_orb,if=buff.arcane_charge.stack<=2/supernova,if=mana.pct<=95/shifting_power,if=cooldown.evocation.remains>0
+    arcane_blast,if=buff.rule_of_threes.up&buff.arcane_charge.stack>3
+    arcane_barrage,if=cooldown.touch_of_the_magi.remains=0&(cooldown.rune_of_power.remains=0|cooldown.arcane_power.remains=0)&buff.arcane_charge.stack=buff.arcane_charge.max_stack
+    arcane_barrage,if=mana.pct<=variable.barrage_mana_pct&buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down&buff.arcane_charge.stack=buff.arcane_charge.max_stack&cooldown.evocation.remains>0
+    arcane_barrage,if=buff.arcane_power.down&buff.rune_of_power.down&debuff.touch_of_the_magi.down&buff.arcane_charge.stack=buff.arcane_charge.max_stack&talent.arcane_orb.enabled&cooldown.arcane_orb.remains<=gcd&mana.pct<=90&cooldown.evocation.remains>0
+    arcane_barrage,if=buff.arcane_power.up&buff.arcane_power.remains<=gcd&buff.arcane_charge.stack=buff.arcane_charge.max_stack
+    arcane_barrage,if=buff.rune_of_power.up&buff.rune_of_power.remains<=gcd&buff.arcane_charge.stack=buff.arcane_charge.max_stack/arcane_blast
+    evocation,interrupt_if=mana.pct>=85,interrupt_immediate=1/arcane_barrage
   Priorities (actions.aoe):
     use_mana_gem,if=(talent.enlightened.enabled&mana.pct<=80&mana.pct>=65)|(!talent.enlightened.enabled&mana.pct<=85)
     berserking,if=buff.arcane_power.up/time_warp,if=runeforge.temporal_warp.equipped
@@ -64,39 +98,44 @@ Player: arcane troll mage arcane 60
     arcane_explosion,if=buff.arcane_charge.stack<buff.arcane_charge.max_stack
     arcane_barrage,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack/evocation,interrupt_if=mana.pct>=85,interrupt_immediate=1
   Actions:
-    arcane_barrage               Count=  46.8|  6.431sec  DPE=19189|23.83%  DPET=15933  DPR=   0  pDPS=3003  Miss= 0.00%  Hit=  3146|  2260|  7345  Crit=  6274|  4520| 14689|22.28%
-    arcane_explosion             Count= 160.7|  1.853sec  DPE=15167|64.62%  DPET=12527  DPR=   4  pDPS=8146  Miss= 0.00%  Hit=  2483|  2332|  3031  Crit=  4967|  4663|  6062|22.15%
-    arcane_power                 Count=   3.5| 99.789sec  DPE=    0| 0.00%  DPET=    0  DPR=   0  pDPS=   0
-    berserking                   Count=   2.0|199.387sec  DPE=    0| 0.00%  DPET=    0  DPR=   0  pDPS=   0
-    evocation                    Count=   2.0|126.067sec  DPE=    0| 0.00%  DPET=    0  DPR=   0  pDPS=   0  TickCount=    12  UpTime=  2.81%
-    frostbolt                    Count=   0.0|  0.000sec  DPE=    0| 0.05%  DPET=    0  DPR=   2  pDPS=   7  Miss= 0.00%  Hit=  1585|  1585|  1585  Crit=  3170|  3170|  3170|21.97%
-    mirror_image                 Count=   1.0|  0.000sec  DPE= 5216| 0.00%  DPET=    0  DPR=   0  pDPS=   0
-    shifting_power               Count=   6.2| 48.980sec  DPE=45055| 7.41%  DPET= 8852  DPR=  18  pDPS= 934  TickCount=    25  MissTick= 0.00%  Tick=  1861|  1859|  1861  CritTick=  3722|  3719|  3722|22.27%  UpTime= 10.02%
-    touch_of_the_magi            Count=   7.1| 44.933sec  DPE=20964| 0.00%  DPET=17013  DPR=   8  pDPS=   0
-    touch_of_the_magi_explosion  Count=   7.1| 44.818sec  DPE=20964| 3.95%  DPET=    0  DPR=   0  pDPS= 499  Miss= 0.00%  Hit=  4204|   416| 14922
-    use_mana_gem                 Count=   2.9|121.651sec  DPE=    0| 0.00%  DPET=    0  DPR=   0  pDPS=   0
-   mirror_image (DPS=130.39614469668047)
-    frostbolt                    Count=  93.0|  1.262sec  DPE=   56| 0.14%  DPET=   44  DPR=   0  pDPS= 130  Miss= 0.00%  Hit=    46|    46|    46  Crit=    92|    92|    92|21.75%
+    arcane_barrage               Count=  48.3|  6.240sec  DPE=19132|24.19%  DPET=15859  DPR=   0  pDPS=3080  Miss= 0.00%  Hit=  3138|  1242|  7345  Crit=  6299|  2485| 14689|22.05%
+    arcane_blast                 Count=   0.0|  0.000sec  DPE= 1418| 0.00%  DPET=  775  DPR=   1  pDPS=   0  Miss= 0.00%  Hit=  1418|  1418|  1418
+    arcane_explosion             Count= 166.2|  1.797sec  DPE=15147|65.91%  DPET=12508  DPR=   4  pDPS=8391  Miss= 0.00%  Hit=  2480|  2332|  3031  Crit=  4961|  4663|  6062|22.13%
+    arcane_power                 Count=   3.5|100.038sec  DPE=    0| 0.00%  DPET=    0  DPR=   0  pDPS=   0
+    berserking                   Count=   2.0|200.141sec  DPE=    0| 0.00%  DPET=    0  DPR=   0  pDPS=   0
+    evocation                    Count=   2.5|113.025sec  DPE=    0| 0.00%  DPET=    0  DPR=   0  pDPS=   0  TickCount=    15  UpTime=  3.42%
+    frostbolt                    Count=   0.0|  0.000sec  DPE=    0| 0.05%  DPET=    0  DPR=   2  pDPS=   7  Miss= 0.00%  Hit=  1585|  1585|  1585  Crit=  3170|  3170|  3170|26.23%
+    mirror_image                 Count=   1.0|  0.000sec  DPE= 5243| 0.00%  DPET=    0  DPR=   0  pDPS=   0
+    shifting_power               Count=   6.3| 49.103sec  DPE=35694| 5.85%  DPET=10211  DPR=  14  pDPS= 745  TickCount=    25  MissTick= 0.00%  Tick=  1469|  1469|  1469  CritTick=  2938|  2938|  2938|21.89%  UpTime=  6.77%
+    touch_of_the_magi            Count=   7.2| 44.717sec  DPE=20607| 0.00%  DPET=16721  DPR=   8  pDPS=   0
+    touch_of_the_magi_explosion  Count=   7.2| 44.636sec  DPE=20607| 3.86%  DPET=    0  DPR=   0  pDPS= 493  Miss= 0.00%  Hit=  4129|   164| 14922
+    use_mana_gem                 Count=   2.9|120.722sec  DPE=    0| 0.00%  DPET=    0  DPR=   0  pDPS=   0
+   mirror_image (DPS=131.07957847759488)
+    frostbolt                    Count=  93.0|  1.262sec  DPE=   56| 0.14%  DPET=   44  DPR=   0  pDPS= 131  Miss= 0.00%  Hit=    46|    46|    46  Crit=    92|    92|    92|22.39%
 
   Constant Buffs:
     arcane_intellect/battle_shout/power_word_fortitude
   Dynamic Buffs:
-    arcane_charge : start= 47.6 refresh=120.2 interval=  6.3 trigger=  1.8 duration=  4.9 uptime= 77.16%
-    arcane_power  : start=  3.5 refresh=  0.0 interval=100.0 trigger=100.0 duration= 14.7 uptime= 17.00%
-    berserking    : start=  2.0 refresh=  0.0 interval=199.9 trigger=199.9 duration= 12.0 uptime=  8.12%  benefit= 28.57%
-    bloodlust     : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 40.0 uptime= 13.54%
-    clearcasting  : start= 26.5 refresh=  0.2 interval= 11.1 trigger= 11.0 duration=  1.9 uptime= 16.51%
-    evocation     : start=  2.0 refresh=  0.0 interval=127.7 trigger=127.7 duration=  4.2 uptime=  2.81%
+    arcane_charge : start= 49.1 refresh=124.3 interval=  6.1 trigger=  1.7 duration=  4.7 uptime= 77.51%
+    arcane_power  : start=  3.5 refresh=  0.0 interval=100.2 trigger=100.2 duration= 14.7 uptime= 17.07%
+    berserking    : start=  2.0 refresh=  0.0 interval=200.8 trigger=200.8 duration= 12.0 uptime=  8.10%  benefit= 28.57%
+    bloodlust     : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 40.0 uptime= 13.51%
+    clearcasting  : start= 26.6 refresh=  0.2 interval= 11.1 trigger= 11.0 duration=  1.8 uptime= 15.85%
+    evocation     : start=  2.5 refresh=  0.0 interval=111.9 trigger=111.9 duration=  4.2 uptime=  3.42%
   Benefits:
-    100.00% : Arcane Barrage Arcane Charge 4
+      0.11% : Arcane Barrage Arcane Charge 1
+      0.06% : Arcane Barrage Arcane Charge 2
+      0.04% : Arcane Barrage Arcane Charge 3
+     99.80% : Arcane Barrage Arcane Charge 4
+      0.33% : Arcane Blast Arcane Charge 0  
   Up-Times:
-      0.61% : Mana Cap                      
+      0.43% : Mana Cap                      
     100.00% : Conserve Phase                
   Gains:
-    385623.0 : mana_regen     (mana)         
-     99851.0 : Evocation      (mana)         
-     18893.8 : Mana Gem       (mana)         
-    121722.6 : Arcane Barrage (mana)         
+    387675.1 : mana_regen     (mana)         
+    121362.1 : Evocation      (mana)         
+     18809.6 : Mana Gem       (mana)         
+    125488.7 : Arcane Barrage (mana)         
     Pet "mirror_image" Gains:
   Waiting:  0.00%
 
@@ -104,10 +143,10 @@ Player: arcane troll mage arcane 60
  *** Targets *** 
 
 Target: e1 humanoid enemy unknown 63
-  DTPS=3171.705343922335 DTPS-Error=10.099051754850553/0.32% DTPS-Range=254.4983840898842/8.02%
-  DPR=0.0 RPS-Out=2972.6738949290057 RPS-In=0.0 Resource=health Waiting=0.0 ApM=0.0
+  DTPS=3214.3640761122606 DTPS-Error=9.915259466102452/0.31% DTPS-Range=294.9409009498736/9.18%
+  DPR=0.0 RPS-Out=2992.80363006872 RPS-In=0.0 Resource=health Waiting=0.0 ApM=0.0
   Talents: 0000000
-  Core Stats:    strength=0|0(0)  agility=0|0(0)  stamina=0|0(0)  intellect=0|0(0)  spirit=0|0(0)  health=0|755477  mana=0|0
+  Core Stats:    strength=0|0(0)  agility=0|0(0)  stamina=0|0(0)  intellect=0|0(0)  spirit=0|0(0)  health=0|1086774  mana=0|0
   Generic Stats: mastery=0.00%|0.00%(0)  versatility=0.00%|0.00%(0)  leech=0.00%|0.00%(0)  runspeed=7.00%|7.00%(0)
   Spell Stats:   power=0|0(0)  hit=0.00%|0.00%(0)  crit=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%  manareg=0|0(0)
   Attack Stats:  power=0|0(0)  hit=0.00%|0.00%(0)  crit=5.00%|5.00%(0)  expertise=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%
@@ -121,24 +160,24 @@ Target: e1 humanoid enemy unknown 63
   Constant Buffs:
     arcane_intellect/battle_shout/bleeding/chaos_brand/mortal_wounds/mystic_touch/power_word_fortitude
   Dynamic Buffs:
-    Health Decade (0 - 10)   : start=  0.7 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 51.9 uptime= 11.95%
-    Health Decade (10 - 20)  : start=  0.9 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 28.7 uptime=  8.67%
-    Health Decade (20 - 30)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 30.6 uptime= 10.27%
-    Health Decade (30 - 40)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.6 uptime= 10.71%
-    Health Decade (40 - 50)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.9 uptime= 11.13%
-    Health Decade (50 - 60)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.2 uptime= 10.91%
-    Health Decade (60 - 70)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.5 uptime= 10.99%
-    Health Decade (70 - 80)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.8 uptime= 11.10%
-    Health Decade (80 - 90)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 25.4 uptime=  8.58%
-    Health Decade (90 - 100) : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 20.5 uptime=  5.70%
-    touch_of_the_magi        : start=  7.1 refresh=  0.0 interval= 44.6 trigger= 44.7 duration=  7.9 uptime= 18.82%
+    Health Decade (0 - 10)   : start=  0.8 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 54.2 uptime= 13.37%
+    Health Decade (10 - 20)  : start=  0.9 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 29.4 uptime=  8.79%
+    Health Decade (20 - 30)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 30.1 uptime= 10.01%
+    Health Decade (30 - 40)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.4 uptime= 10.60%
+    Health Decade (40 - 50)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.5 uptime= 10.95%
+    Health Decade (50 - 60)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.0 uptime= 10.46%
+    Health Decade (60 - 70)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.0 uptime= 10.80%
+    Health Decade (70 - 80)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.4 uptime= 10.92%
+    Health Decade (80 - 90)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 25.4 uptime=  8.57%
+    Health Decade (90 - 100) : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 20.1 uptime=  5.53%
+    touch_of_the_magi        : start=  7.2 refresh=  0.0 interval= 44.6 trigger= 44.7 duration=  7.9 uptime= 18.88%
   Waiting:  0.00%
 
 Target: e2 humanoid enemy unknown 63
-  DTPS=2357.443622766211 DTPS-Error=6.084802841274479/0.26% DTPS-Range=155.36030800080357/6.59%
-  DPR=0.0 RPS-Out=2175.700314673577 RPS-In=0.0 Resource=health Waiting=0.0 ApM=0.0
+  DTPS=2379.1875630881427 DTPS-Error=6.3102805028380855/0.27% DTPS-Range=169.50425321936177/7.12%
+  DPR=0.0 RPS-Out=2215.9853231983757 RPS-In=0.0 Resource=health Waiting=0.0 ApM=0.0
   Talents: 0000000
-  Core Stats:    strength=0|0(0)  agility=0|0(0)  stamina=0|0(0)  intellect=0|0(0)  spirit=0|0(0)  health=0|732916  mana=0|0
+  Core Stats:    strength=0|0(0)  agility=0|0(0)  stamina=0|0(0)  intellect=0|0(0)  spirit=0|0(0)  health=0|680943  mana=0|0
   Generic Stats: mastery=0.00%|0.00%(0)  versatility=0.00%|0.00%(0)  leech=0.00%|0.00%(0)  runspeed=7.00%|7.00%(0)
   Spell Stats:   power=0|0(0)  hit=0.00%|0.00%(0)  crit=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%  manareg=0|0(0)
   Attack Stats:  power=0|0(0)  hit=0.00%|0.00%(0)  crit=5.00%|5.00%(0)  expertise=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%
@@ -152,23 +191,23 @@ Target: e2 humanoid enemy unknown 63
   Constant Buffs:
     arcane_intellect/battle_shout/bleeding/chaos_brand/mortal_wounds/mystic_touch/power_word_fortitude
   Dynamic Buffs:
-    Health Decade (0 - 10)   : start=  0.8 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 56.2 uptime= 13.82%
-    Health Decade (10 - 20)  : start=  0.9 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 28.6 uptime=  8.64%
-    Health Decade (20 - 30)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 29.3 uptime=  9.85%
-    Health Decade (30 - 40)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 30.6 uptime= 10.38%
-    Health Decade (40 - 50)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.9 uptime= 10.79%
-    Health Decade (50 - 60)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.0 uptime= 10.48%
-    Health Decade (60 - 70)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.8 uptime= 10.76%
-    Health Decade (70 - 80)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.8 uptime= 10.76%
-    Health Decade (80 - 90)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 25.2 uptime=  8.52%
-    Health Decade (90 - 100) : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 21.4 uptime=  6.00%
+    Health Decade (0 - 10)   : start=  0.7 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 56.1 uptime= 12.69%
+    Health Decade (10 - 20)  : start=  0.9 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 28.5 uptime=  7.95%
+    Health Decade (20 - 30)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 29.6 uptime=  9.81%
+    Health Decade (30 - 40)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.4 uptime= 10.60%
+    Health Decade (40 - 50)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.6 uptime= 11.02%
+    Health Decade (50 - 60)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.6 uptime= 10.66%
+    Health Decade (60 - 70)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.8 uptime= 10.74%
+    Health Decade (70 - 80)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 33.8 uptime= 11.42%
+    Health Decade (80 - 90)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 26.3 uptime=  8.89%
+    Health Decade (90 - 100) : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 22.1 uptime=  6.22%
   Waiting:  0.00%
 
 Target: e3 humanoid enemy unknown 63
-  DTPS=2359.124016694474 DTPS-Error=6.295590290147968/0.27% DTPS-Range=145.48903063531998/6.17%
-  DPR=0.0 RPS-Out=2209.254867072396 RPS-In=0.0 Resource=health Waiting=0.0 ApM=0.0
+  DTPS=2378.919582895157 DTPS-Error=6.695670724301651/0.28% DTPS-Range=169.2008156896868/7.11%
+  DPR=0.0 RPS-Out=2196.6536686004374 RPS-In=0.0 Resource=health Waiting=0.0 ApM=0.0
   Talents: 0000000
-  Core Stats:    strength=0|0(0)  agility=0|0(0)  stamina=0|0(0)  intellect=0|0(0)  spirit=0|0(0)  health=0|803870  mana=0|0
+  Core Stats:    strength=0|0(0)  agility=0|0(0)  stamina=0|0(0)  intellect=0|0(0)  spirit=0|0(0)  health=0|798436  mana=0|0
   Generic Stats: mastery=0.00%|0.00%(0)  versatility=0.00%|0.00%(0)  leech=0.00%|0.00%(0)  runspeed=7.00%|7.00%(0)
   Spell Stats:   power=0|0(0)  hit=0.00%|0.00%(0)  crit=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%  manareg=0|0(0)
   Attack Stats:  power=0|0(0)  hit=0.00%|0.00%(0)  crit=5.00%|5.00%(0)  expertise=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%
@@ -182,23 +221,23 @@ Target: e3 humanoid enemy unknown 63
   Constant Buffs:
     arcane_intellect/battle_shout/bleeding/chaos_brand/mortal_wounds/mystic_touch/power_word_fortitude
   Dynamic Buffs:
-    Health Decade (0 - 10)   : start=  0.7 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 52.1 uptime= 12.18%
-    Health Decade (10 - 20)  : start=  0.9 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 28.7 uptime=  8.35%
-    Health Decade (20 - 30)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 30.1 uptime= 10.05%
-    Health Decade (30 - 40)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.3 uptime= 10.61%
-    Health Decade (40 - 50)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.5 uptime= 11.00%
-    Health Decade (50 - 60)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.6 uptime= 10.69%
-    Health Decade (60 - 70)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.3 uptime= 10.95%
-    Health Decade (70 - 80)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 33.0 uptime= 11.17%
-    Health Decade (80 - 90)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 26.1 uptime=  8.82%
-    Health Decade (90 - 100) : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 21.9 uptime=  6.17%
+    Health Decade (0 - 10)   : start=  0.8 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 59.2 uptime= 13.90%
+    Health Decade (10 - 20)  : start=  0.9 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 27.7 uptime=  8.38%
+    Health Decade (20 - 30)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 29.8 uptime=  9.92%
+    Health Decade (30 - 40)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 30.7 uptime= 10.36%
+    Health Decade (40 - 50)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.5 uptime= 10.97%
+    Health Decade (50 - 60)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 30.4 uptime= 10.30%
+    Health Decade (60 - 70)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.1 uptime= 10.52%
+    Health Decade (70 - 80)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.9 uptime= 11.11%
+    Health Decade (80 - 90)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 25.3 uptime=  8.55%
+    Health Decade (90 - 100) : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 21.4 uptime=  6.00%
   Waiting:  0.00%
 
 Target: e4 humanoid enemy unknown 63
-  DTPS=2356.9064636951803 DTPS-Error=6.695183248834878/0.28% DTPS-Range=170.2095584604067/7.22%
-  DPR=0.0 RPS-Out=2196.5226644262043 RPS-In=0.0 Resource=health Waiting=0.0 ApM=0.0
+  DTPS=2380.0227348853973 DTPS-Error=7.02286194022993/0.30% DTPS-Range=180.68966194996779/7.59%
+  DPR=0.0 RPS-Out=2195.437274568561 RPS-In=0.0 Resource=health Waiting=0.0 ApM=0.0
   Talents: 0000000
-  Core Stats:    strength=0|0(0)  agility=0|0(0)  stamina=0|0(0)  intellect=0|0(0)  spirit=0|0(0)  health=0|670190  mana=0|0
+  Core Stats:    strength=0|0(0)  agility=0|0(0)  stamina=0|0(0)  intellect=0|0(0)  spirit=0|0(0)  health=0|751569  mana=0|0
   Generic Stats: mastery=0.00%|0.00%(0)  versatility=0.00%|0.00%(0)  leech=0.00%|0.00%(0)  runspeed=7.00%|7.00%(0)
   Spell Stats:   power=0|0(0)  hit=0.00%|0.00%(0)  crit=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%  manareg=0|0(0)
   Attack Stats:  power=0|0(0)  hit=0.00%|0.00%(0)  crit=5.00%|5.00%(0)  expertise=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%
@@ -212,23 +251,23 @@ Target: e4 humanoid enemy unknown 63
   Constant Buffs:
     arcane_intellect/battle_shout/bleeding/chaos_brand/mortal_wounds/mystic_touch/power_word_fortitude
   Dynamic Buffs:
-    Health Decade (0 - 10)   : start=  0.8 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 53.6 uptime= 12.76%
-    Health Decade (10 - 20)  : start=  0.9 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 28.2 uptime=  8.72%
-    Health Decade (20 - 30)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 30.6 uptime= 10.27%
-    Health Decade (30 - 40)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 30.9 uptime= 10.45%
-    Health Decade (40 - 50)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.3 uptime= 10.92%
-    Health Decade (50 - 60)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.2 uptime= 10.54%
-    Health Decade (60 - 70)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.6 uptime= 10.71%
-    Health Decade (70 - 80)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.2 uptime= 10.88%
+    Health Decade (0 - 10)   : start=  0.8 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 57.9 uptime= 14.04%
+    Health Decade (10 - 20)  : start=  0.9 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 27.9 uptime=  8.46%
+    Health Decade (20 - 30)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 29.0 uptime=  9.69%
+    Health Decade (30 - 40)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 30.8 uptime= 10.42%
+    Health Decade (40 - 50)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.4 uptime= 10.94%
+    Health Decade (50 - 60)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 30.1 uptime= 10.16%
+    Health Decade (60 - 70)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.3 uptime= 10.58%
+    Health Decade (70 - 80)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.8 uptime= 11.06%
     Health Decade (80 - 90)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 25.5 uptime=  8.61%
-    Health Decade (90 - 100) : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 21.9 uptime=  6.15%
+    Health Decade (90 - 100) : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 21.5 uptime=  6.04%
   Waiting:  0.00%
 
 Target: e5 humanoid enemy unknown 63
-  DTPS=2360.646593737284 DTPS-Error=6.220322192029548/0.26% DTPS-Range=146.12141682545325/6.19%
-  DPR=0.0 RPS-Out=2207.118215084389 RPS-In=0.0 Resource=health Waiting=0.0 ApM=0.0
+  DTPS=2381.0824057403793 DTPS-Error=6.150983014561569/0.26% DTPS-Range=169.06423780651699/7.10%
+  DPR=0.0 RPS-Out=2211.9260936662404 RPS-In=0.0 Resource=health Waiting=0.0 ApM=0.0
   Talents: 0000000
-  Core Stats:    strength=0|0(0)  agility=0|0(0)  stamina=0|0(0)  intellect=0|0(0)  spirit=0|0(0)  health=0|799448  mana=0|0
+  Core Stats:    strength=0|0(0)  agility=0|0(0)  stamina=0|0(0)  intellect=0|0(0)  spirit=0|0(0)  health=0|822857  mana=0|0
   Generic Stats: mastery=0.00%|0.00%(0)  versatility=0.00%|0.00%(0)  leech=0.00%|0.00%(0)  runspeed=7.00%|7.00%(0)
   Spell Stats:   power=0|0(0)  hit=0.00%|0.00%(0)  crit=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%  manareg=0|0(0)
   Attack Stats:  power=0|0(0)  hit=0.00%|0.00%(0)  crit=5.00%|5.00%(0)  expertise=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%
@@ -242,280 +281,280 @@ Target: e5 humanoid enemy unknown 63
   Constant Buffs:
     arcane_intellect/battle_shout/bleeding/chaos_brand/mortal_wounds/mystic_touch/power_word_fortitude
   Dynamic Buffs:
-    Health Decade (0 - 10)   : start=  0.7 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 55.6 uptime= 12.05%
-    Health Decade (10 - 20)  : start=  0.9 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 28.3 uptime=  8.12%
-    Health Decade (20 - 30)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 30.2 uptime= 10.11%
-    Health Decade (30 - 40)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.5 uptime= 10.68%
-    Health Decade (40 - 50)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.6 uptime= 11.04%
-    Health Decade (50 - 60)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.1 uptime= 10.86%
-    Health Decade (60 - 70)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.9 uptime= 10.81%
-    Health Decade (70 - 80)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 33.1 uptime= 11.22%
-    Health Decade (80 - 90)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 26.0 uptime=  8.80%
-    Health Decade (90 - 100) : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 22.3 uptime=  6.32%
+    Health Decade (0 - 10)   : start=  0.8 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 55.4 uptime= 13.36%
+    Health Decade (10 - 20)  : start=  0.9 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 27.5 uptime=  8.55%
+    Health Decade (20 - 30)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 30.1 uptime=  9.92%
+    Health Decade (30 - 40)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.4 uptime= 10.59%
+    Health Decade (40 - 50)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 32.1 uptime= 10.81%
+    Health Decade (50 - 60)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 30.8 uptime= 10.41%
+    Health Decade (60 - 70)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 31.3 uptime= 10.57%
+    Health Decade (70 - 80)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 33.1 uptime= 11.15%
+    Health Decade (80 - 90)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 25.6 uptime=  8.64%
+    Health Decade (90 - 100) : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 21.5 uptime=  6.00%
   Waiting:  0.00%
 
 
 Profilesets (median Damage per Second):
-     21474.769 : ArF_ROP_Res_AO_En
-     21118.645 : ArF_ROP_Res_AO_OP
-     21084.461 : RoT_ROP_Res_AO_En
-     21067.134 : Amp_ROP_Res_AO_En
-     20963.098 : RoT_ROP_Res_AO_OP
-     20937.135 : ArF_ROP_Res_AO_TA
-     20903.181 : Amp_ROP_Res_AO_OP
-     20767.623 : ArF_ROP_Res_Rev_En
-     20726.761 : Amp_ROP_Res_AO_TA
-     20717.758 : RoT_ROP_Res_AO_TA
-     20650.017 : ArF_ROP_Res_Rev_OP
-     20417.617 : ArF_ROP_Res_Rev_TA
-     20412.133 : Amp_ROP_Res_Rev_OP
-     20365.733 : RoT_ROP_Res_Rev_OP
-     20363.936 : RoT_ROP_Res_Rev_En
-     20273.391 : Amp_ROP_Res_Rev_En
-     20230.909 : Amp_ROP_Res_Rev_TA
-     20139.947 : RoT_ROP_Res_Rev_TA
-     19876.312 : ArF_IF_Res_AO_En
-     19855.209 : ArF_FM_Res_AO_En
-     19550.840 : ArF_IF_Res_AO_OP
-     19549.979 : ArF_FM_Res_AO_OP
-     19491.401 : RoT_FM_Res_AO_En
-     19490.096 : Amp_IF_Res_AO_En
-     19461.905 : Amp_FM_Res_AO_En
-     19447.288 : RoT_IF_Res_AO_En
-     19405.873 : ArF_FM_Res_AO_TA
-     19386.341 : ArF_IF_Res_AO_TA
-     19353.465 : Amp_FM_Res_AO_OP
-     19353.131 : RoT_IF_Res_AO_OP
-     19323.957 : Amp_IF_Res_AO_OP
-     19319.340 : RoT_FM_Res_AO_OP
-     19226.718 : RoT_FM_Res_AO_TA
-     19209.733 : Amp_FM_Res_AO_TA
-     19204.830 : Amp_IF_Res_AO_TA
-     19191.562 : RoT_IF_Res_AO_TA
-     19135.971 : ArF_IF_Res_Rev_En
-     19065.516 : ArF_FM_Res_Rev_En
-     19003.264 : ArF_IF_Res_Rev_OP
-     19002.856 : ArF_FM_Res_Rev_OP
-     18967.388 : ArF_FM_Res_Rev_TA
-     18946.759 : ArF_IF_Res_Rev_TA
-     18871.443 : ArF_ROP_Res_SN_OP
-     18785.476 : Amp_IF_Res_Rev_OP
-     18781.793 : RoT_IF_Res_Rev_OP
-     18757.393 : Amp_IF_Res_Rev_TA
-     18754.540 : Amp_FM_Res_Rev_OP
-     18750.988 : RoT_IF_Res_Rev_TA
-     18717.522 : Amp_FM_Res_Rev_En
-     18715.663 : Amp_IF_Res_Rev_En
-     18714.278 : RoT_FM_Res_Rev_OP
-     18710.327 : Amp_FM_Res_Rev_TA
-     18704.069 : RoT_IF_Res_Rev_En
-     18704.046 : ArF_ROP_Res_SN_TA
-     18694.461 : RoT_FM_Res_Rev_TA
-     18666.226 : RoT_FM_Res_Rev_En
-     18600.244 : RoT_ROP_Res_SN_OP
-     18591.189 : Amp_ROP_Res_SN_OP
-     18590.974 : ArF_ROP_Res_SN_En
-     18562.057 : ArF_ROP_AE_AO_En
-     18468.716 : Amp_ROP_Res_SN_TA
-     18453.621 : RoT_ROP_Res_SN_TA
-     18319.670 : ArF_ROP_AE_AO_OP
-     18304.228 : Amp_ROP_Res_SN_En
-     18258.447 : RoT_ROP_Res_SN_En
-     18112.465 : ArF_ROP_AE_AO_TA
-     18043.536 : ArF_ROP_NT_AO_En
-     17908.984 : Amp_ROP_AE_AO_En
-     17907.398 : RoT_ROP_AE_AO_En
-     17821.544 : Amp_ROP_AE_AO_OP
-     17799.564 : RoT_ROP_AE_AO_OP
-     17752.238 : Amp_ROP_NT_AO_En
-     17721.747 : RoT_ROP_NT_AO_En
-     17645.326 : ArF_ROP_AE_Rev_En
-     17588.696 : RoT_ROP_AE_AO_TA
-     17556.639 : Amp_ROP_AE_AO_TA
-     17544.719 : ArF_ROP_AE_Rev_OP
-     17541.616 : ArF_ROP_NT_AO_OP
-     17528.020 : ArF_ROP_NT_AO_TA
-     17470.383 : ArF_FM_Res_SN_OP
-     17451.142 : ArF_IF_Res_SN_TA
-     17449.916 : ArF_FM_Res_SN_TA
-     17445.723 : ArF_IF_Res_SN_OP
-     17432.688 : ArF_ROP_NT_Rev_En
-     17353.843 : RoT_ROP_NT_AO_TA
-     17349.553 : Amp_ROP_NT_AO_OP
-     17343.737 : RoT_ROP_NT_AO_OP
-     17343.671 : ArF_ROP_AE_Rev_TA
-     17335.378 : ArF_IF_Res_SN_En
-     17311.592 : Amp_ROP_NT_AO_TA
-     17306.005 : RoT_IF_Res_SN_OP
-     17303.904 : ArF_FM_Res_SN_En
-     17299.102 : Amp_IF_Res_SN_OP
-     17241.529 : Amp_FM_Res_SN_OP
-     17239.224 : RoT_FM_Res_SN_OP
-     17227.356 : RoT_IF_Res_SN_TA
-     17201.168 : ArF_FM_AE_AO_En
-     17194.335 : Amp_IF_Res_SN_TA
-     17193.883 : Amp_FM_Res_SN_TA
-     17186.608 : RoT_FM_Res_SN_TA
-     17181.032 : ArF_IF_AE_AO_En
-     17118.382 : RoT_ROP_NT_Rev_En
-     17115.520 : Amp_ROP_NT_Rev_En
-     17081.089 : Amp_FM_Res_SN_En
-     17070.553 : Amp_IF_Res_SN_En
-     17056.144 : RoT_IF_Res_SN_En
-     17035.318 : RoT_FM_Res_SN_En
-     17027.035 : ArF_IF_NT_AO_En
-     17014.084 : Amp_ROP_AE_Rev_OP
-     16999.813 : RoT_ROP_AE_Rev_OP
-     16998.894 : ArF_FM_NT_AO_En
-     16978.074 : ArF_ROP_NT_Rev_OP
-     16961.794 : RoT_ROP_AE_Rev_En
-     16956.550 : Amp_ROP_AE_Rev_En
-     16931.506 : ArF_ROP_NT_Rev_TA
-     16899.802 : ArF_FM_AE_AO_OP
-     16887.985 : RoT_ROP_AE_Rev_TA
-     16879.284 : ArF_IF_AE_AO_OP
-     16850.577 : Amp_ROP_AE_Rev_TA
-     16792.029 : RoT_ROP_NT_Rev_OP
-     16779.917 : Amp_ROP_NT_Rev_OP
-     16751.587 : ArF_IF_AE_AO_TA
-     16743.824 : ArF_FM_AE_AO_TA
-     16725.013 : Amp_IF_NT_AO_En
-     16722.353 : RoT_FM_NT_AO_En
-     16717.554 : RoT_IF_NT_AO_En
-     16716.712 : RoT_ROP_NT_Rev_TA
-     16706.702 : Amp_FM_NT_AO_En
-     16694.866 : Amp_ROP_NT_Rev_TA
-     16596.351 : ArF_ROP_AE_SN_OP
-     16594.844 : RoT_FM_AE_AO_En
-     16585.037 : RoT_IF_AE_AO_En
-     16578.862 : Amp_IF_AE_AO_En
-     16571.080 : Amp_FM_AE_AO_En
-     16530.275 : ArF_ROP_AE_SN_TA
-     16523.734 : ArF_IF_NT_AO_OP
-     16507.663 : ArF_ROP_NT_SN_En
-     16472.531 : ArF_FM_NT_AO_OP
-     16463.021 : ArF_IF_NT_AO_TA
-     16458.252 : Amp_IF_AE_AO_OP
-     16451.625 : ArF_FM_NT_AO_TA
-     16450.738 : RoT_FM_AE_AO_OP
-     16447.803 : RoT_IF_AE_AO_OP
-     16435.053 : Amp_FM_AE_AO_OP
-     16378.321 : ArF_ROP_AE_SN_En
-     16356.771 : Amp_IF_AE_AO_TA
-     16348.397 : RoT_IF_AE_AO_TA
-     16343.113 : ArF_ROP_NT_SN_OP
-     16334.675 : Amp_FM_AE_AO_TA
-     16331.788 : RoT_IF_NT_AO_OP
-     16330.007 : Amp_IF_NT_AO_OP
-     16292.327 : ArF_FM_AE_Rev_En
-     16291.819 : ArF_IF_AE_Rev_En
-     16281.000 : RoT_FM_AE_AO_TA
-     16270.373 : Amp_FM_NT_AO_OP
-     16269.170 : Amp_FM_NT_AO_TA
-     16261.570 : Amp_IF_NT_AO_TA
-     16259.621 : RoT_FM_NT_AO_OP
-     16253.962 : ArF_FM_NT_Rev_En
-     16247.475 : RoT_FM_NT_AO_TA
-     16245.546 : ArF_ROP_NT_SN_TA
-     16236.795 : ArF_IF_NT_Rev_En
-     16231.875 : RoT_IF_NT_AO_TA
-     16142.311 : ArF_IF_AE_Rev_OP
-     16140.727 : Amp_ROP_NT_SN_En
-     16139.101 : ArF_FM_AE_Rev_OP
-     16136.332 : ArF_IF_AE_Rev_TA
-     16129.779 : ArF_FM_AE_Rev_TA
-     16125.084 : Amp_ROP_NT_SN_OP
-     16123.154 : RoT_ROP_NT_SN_OP
-     16105.464 : RoT_ROP_NT_SN_En
-     16097.501 : RoT_ROP_AE_SN_OP
-     16074.539 : Amp_ROP_AE_SN_OP
-     16031.532 : Amp_ROP_AE_SN_TA
-     16004.401 : Amp_ROP_NT_SN_TA
-     15992.188 : RoT_ROP_AE_SN_TA
-     15980.662 : RoT_ROP_NT_SN_TA
-     15948.480 : Amp_IF_NT_Rev_En
-     15924.971 : RoT_IF_NT_Rev_En
-     15915.119 : Amp_FM_NT_Rev_En
-     15914.992 : RoT_FM_NT_Rev_En
-     15835.649 : ArF_IF_NT_Rev_OP
-     15834.968 : RoT_ROP_AE_SN_En
-     15824.178 : ArF_FM_NT_Rev_OP
-     15817.736 : ArF_FM_NT_Rev_TA
-     15809.229 : ArF_IF_NT_Rev_TA
-     15802.434 : Amp_ROP_AE_SN_En
-     15675.771 : Amp_IF_AE_Rev_OP
-     15673.322 : RoT_IF_AE_Rev_En
-     15672.544 : RoT_FM_AE_Rev_OP
-     15671.619 : RoT_IF_AE_Rev_OP
-     15670.015 : Amp_FM_AE_Rev_OP
-     15668.552 : Amp_IF_AE_Rev_TA
-     15666.640 : Amp_FM_AE_Rev_TA
-     15665.172 : RoT_FM_AE_Rev_En
-     15663.883 : RoT_IF_AE_Rev_TA
-     15655.202 : RoT_FM_AE_Rev_TA
-     15650.879 : Amp_IF_NT_Rev_OP
-     15646.401 : Amp_IF_AE_Rev_En
-     15644.683 : RoT_FM_NT_Rev_OP
-     15638.777 : Amp_FM_AE_Rev_En
-     15633.792 : RoT_FM_NT_Rev_TA
-     15632.590 : Amp_IF_NT_Rev_TA
-     15627.302 : Amp_FM_NT_Rev_TA
-     15612.864 : RoT_IF_NT_Rev_OP
-     15612.753 : RoT_IF_NT_Rev_TA
-     15601.142 : Amp_FM_NT_Rev_OP
-     15473.761 : ArF_IF_AE_SN_TA
-     15460.869 : ArF_FM_AE_SN_TA
-     15454.226 : ArF_FM_AE_SN_OP
-     15439.234 : ArF_IF_AE_SN_OP
-     15353.969 : ArF_IF_NT_SN_En
-     15350.330 : ArF_IF_AE_SN_En
-     15342.137 : ArF_FM_NT_SN_En
-     15329.846 : ArF_FM_AE_SN_En
-     15221.431 : ArF_IF_NT_SN_OP
-     15216.605 : ArF_IF_NT_SN_TA
-     15209.087 : ArF_FM_NT_SN_OP
-     15208.425 : ArF_FM_NT_SN_TA
-     15033.998 : RoT_IF_AE_SN_OP
-     15027.009 : Amp_IF_AE_SN_OP
-     15022.354 : Amp_IF_NT_SN_OP
-     15022.194 : Amp_IF_AE_SN_TA
-     15021.624 : Amp_FM_NT_SN_En
-     15021.505 : Amp_FM_AE_SN_OP
-     15021.418 : RoT_IF_NT_SN_TA
-     15013.427 : Amp_IF_NT_SN_En
-     15005.503 : Amp_FM_AE_SN_TA
-     15003.051 : RoT_IF_AE_SN_TA
-     14997.473 : RoT_FM_NT_SN_En
-     14997.344 : RoT_IF_NT_SN_En
-     14994.403 : RoT_FM_AE_SN_OP
-     14988.215 : RoT_IF_NT_SN_OP
-     14986.722 : RoT_FM_AE_SN_TA
-     14978.888 : RoT_FM_NT_SN_OP
-     14977.876 : Amp_FM_NT_SN_TA
-     14975.774 : Amp_IF_NT_SN_TA
-     14974.989 : RoT_FM_NT_SN_TA
-     14940.580 : Amp_FM_NT_SN_OP
-     14877.991 : RoT_IF_AE_SN_En
-     14877.780 : Amp_IF_AE_SN_En
-     14863.417 : Amp_FM_AE_SN_En
-     14860.688 : RoT_FM_AE_SN_En
+     21545.420 : ArF_ROP_Res_AO_En
+     21495.792 : ArF_ROP_Res_AO_OP
+     21233.597 : Amp_ROP_Res_AO_OP
+     21199.528 : ArF_ROP_Res_AO_TA
+     21185.459 : RoT_ROP_Res_AO_OP
+     21076.911 : Amp_ROP_Res_AO_En
+     21055.251 : RoT_ROP_Res_AO_En
+     21047.415 : RoT_ROP_Res_AO_TA
+     20968.183 : ArF_ROP_Res_Rev_OP
+     20940.974 : Amp_ROP_Res_AO_TA
+     20871.715 : ArF_ROP_Res_Rev_En
+     20728.125 : ArF_ROP_Res_Rev_TA
+     20698.477 : RoT_ROP_Res_Rev_OP
+     20660.274 : Amp_ROP_Res_Rev_OP
+     20537.456 : Amp_ROP_Res_Rev_TA
+     20478.501 : RoT_ROP_Res_Rev_TA
+     20439.888 : RoT_ROP_Res_Rev_En
+     20381.810 : Amp_ROP_Res_Rev_En
+     20083.162 : ArF_IF_Res_AO_En
+     19987.110 : ArF_FM_Res_AO_En
+     19957.032 : ArF_IF_Res_AO_OP
+     19834.097 : ArF_FM_Res_AO_OP
+     19766.623 : ArF_IF_Res_AO_TA
+     19763.281 : ArF_FM_Res_AO_TA
+     19660.491 : RoT_IF_Res_AO_OP
+     19627.816 : Amp_IF_Res_AO_OP
+     19607.958 : Amp_IF_Res_AO_En
+     19594.709 : RoT_IF_Res_AO_En
+     19573.764 : Amp_IF_Res_AO_TA
+     19571.115 : RoT_FM_Res_AO_OP
+     19569.398 : Amp_FM_Res_AO_OP
+     19557.612 : RoT_IF_Res_AO_TA
+     19535.794 : Amp_FM_Res_AO_En
+     19524.841 : RoT_FM_Res_AO_TA
+     19522.626 : RoT_FM_Res_AO_En
+     19509.726 : Amp_FM_Res_AO_TA
+     19377.679 : ArF_IF_Res_Rev_OP
+     19324.451 : ArF_IF_Res_Rev_TA
+     19300.005 : ArF_IF_Res_Rev_En
+     19294.508 : ArF_FM_Res_Rev_OP
+     19278.113 : ArF_FM_Res_Rev_TA
+     19257.258 : ArF_FM_Res_Rev_En
+     19064.672 : Amp_IF_Res_Rev_TA
+     19063.682 : ArF_ROP_Res_SN_OP
+     19039.988 : RoT_FM_Res_Rev_TA
+     19038.648 : RoT_IF_Res_Rev_OP
+     19023.666 : Amp_FM_Res_Rev_OP
+     19022.681 : RoT_IF_Res_Rev_TA
+     19004.020 : Amp_FM_Res_Rev_TA
+     18990.841 : Amp_IF_Res_Rev_OP
+     18982.968 : RoT_FM_Res_Rev_OP
+     18925.414 : Amp_IF_Res_Rev_En
+     18923.620 : ArF_ROP_Res_SN_TA
+     18880.590 : Amp_FM_Res_Rev_En
+     18861.886 : RoT_IF_Res_Rev_En
+     18852.510 : RoT_ROP_Res_SN_OP
+     18850.808 : RoT_FM_Res_Rev_En
+     18824.676 : Amp_ROP_Res_SN_OP
+     18757.158 : ArF_ROP_Res_SN_En
+     18713.077 : ArF_ROP_AE_AO_En
+     18680.527 : RoT_ROP_Res_SN_TA
+     18673.468 : Amp_ROP_Res_SN_TA
+     18628.648 : ArF_ROP_AE_AO_OP
+     18509.683 : Amp_ROP_Res_SN_En
+     18506.575 : RoT_ROP_Res_SN_En
+     18390.346 : ArF_ROP_NT_AO_En
+     18301.562 : ArF_ROP_AE_AO_TA
+     18131.608 : Amp_ROP_NT_AO_En
+     18104.842 : RoT_ROP_NT_AO_En
+     18082.609 : Amp_ROP_AE_AO_OP
+     18061.132 : RoT_ROP_AE_AO_OP
+     17951.081 : RoT_ROP_AE_AO_En
+     17946.317 : Amp_ROP_AE_AO_En
+     17940.446 : ArF_ROP_NT_AO_OP
+     17864.246 : ArF_ROP_NT_AO_TA
+     17809.600 : Amp_ROP_AE_AO_TA
+     17783.269 : RoT_ROP_AE_AO_TA
+     17757.175 : ArF_ROP_AE_Rev_OP
+     17750.868 : ArF_ROP_AE_Rev_En
+     17732.714 : ArF_IF_Res_SN_OP
+     17694.534 : ArF_FM_Res_SN_OP
+     17673.741 : Amp_ROP_NT_AO_OP
+     17673.172 : RoT_ROP_NT_AO_OP
+     17662.182 : ArF_FM_Res_SN_TA
+     17638.992 : RoT_ROP_NT_AO_TA
+     17630.758 : Amp_ROP_NT_AO_TA
+     17625.561 : ArF_IF_Res_SN_TA
+     17590.295 : ArF_ROP_AE_Rev_TA
+     17573.820 : ArF_ROP_NT_Rev_En
+     17541.936 : ArF_IF_Res_SN_En
+     17537.606 : Amp_IF_Res_SN_OP
+     17518.559 : RoT_IF_Res_SN_OP
+     17494.104 : ArF_FM_Res_SN_En
+     17482.922 : Amp_FM_Res_SN_OP
+     17448.341 : RoT_IF_Res_SN_TA
+     17444.205 : Amp_IF_Res_SN_TA
+     17439.605 : Amp_FM_Res_SN_TA
+     17438.826 : RoT_FM_Res_SN_OP
+     17436.438 : RoT_FM_Res_SN_TA
+     17355.458 : ArF_IF_AE_AO_En
+     17330.785 : RoT_IF_Res_SN_En
+     17322.447 : RoT_FM_Res_SN_En
+     17321.426 : Amp_IF_Res_SN_En
+     17296.196 : Amp_FM_Res_SN_En
+     17291.568 : ArF_FM_AE_AO_En
+     17229.992 : Amp_ROP_NT_Rev_En
+     17218.630 : RoT_ROP_NT_Rev_En
+     17218.091 : ArF_ROP_NT_Rev_OP
+     17182.493 : ArF_IF_AE_AO_OP
+     17180.464 : RoT_ROP_AE_Rev_OP
+     17177.235 : ArF_IF_NT_AO_En
+     17165.167 : ArF_FM_NT_AO_En
+     17157.024 : Amp_ROP_AE_Rev_OP
+     17122.082 : ArF_FM_AE_AO_OP
+     17114.421 : ArF_ROP_NT_Rev_TA
+     17088.014 : RoT_ROP_AE_Rev_TA
+     17059.651 : ArF_IF_AE_AO_TA
+     17046.208 : Amp_ROP_AE_Rev_TA
+     17045.658 : Amp_ROP_AE_Rev_En
+     17045.337 : ArF_FM_AE_AO_TA
+     17037.521 : Amp_ROP_NT_Rev_OP
+     17037.454 : RoT_ROP_NT_Rev_OP
+     16982.074 : RoT_ROP_AE_Rev_En
+     16919.589 : Amp_ROP_NT_Rev_TA
+     16892.451 : RoT_IF_NT_AO_En
+     16886.415 : RoT_ROP_NT_Rev_TA
+     16871.179 : Amp_IF_NT_AO_En
+     16850.826 : RoT_FM_NT_AO_En
+     16850.718 : ArF_ROP_AE_SN_OP
+     16844.649 : Amp_FM_NT_AO_En
+     16730.547 : Amp_IF_AE_AO_OP
+     16727.057 : Amp_IF_AE_AO_En
+     16725.979 : ArF_FM_NT_AO_OP
+     16725.696 : ArF_IF_NT_AO_OP
+     16694.461 : RoT_IF_AE_AO_En
+     16688.928 : ArF_ROP_AE_SN_TA
+     16679.357 : RoT_IF_AE_AO_OP
+     16665.965 : ArF_IF_NT_AO_TA
+     16642.584 : ArF_FM_NT_AO_TA
+     16633.997 : RoT_FM_AE_AO_OP
+     16629.996 : RoT_IF_AE_AO_TA
+     16628.062 : Amp_FM_AE_AO_En
+     16622.307 : RoT_FM_AE_AO_En
+     16612.341 : Amp_FM_AE_AO_OP
+     16610.782 : RoT_IF_NT_AO_OP
+     16602.177 : Amp_IF_AE_AO_TA
+     16595.027 : Amp_FM_AE_AO_TA
+     16557.950 : Amp_IF_NT_AO_OP
+     16555.136 : ArF_ROP_AE_SN_En
+     16549.300 : RoT_FM_AE_AO_TA
+     16520.565 : RoT_FM_NT_AO_OP
+     16492.745 : Amp_FM_NT_AO_OP
+     16486.281 : ArF_ROP_NT_SN_OP
+     16484.397 : Amp_IF_NT_AO_TA
+     16483.111 : ArF_ROP_NT_SN_En
+     16478.208 : Amp_FM_NT_AO_TA
+     16476.078 : RoT_IF_NT_AO_TA
+     16473.865 : RoT_FM_NT_AO_TA
+     16429.572 : ArF_IF_NT_Rev_En
+     16401.713 : ArF_FM_AE_Rev_En
+     16397.608 : ArF_IF_AE_Rev_En
+     16386.518 : ArF_FM_AE_Rev_OP
+     16384.296 : ArF_ROP_NT_SN_TA
+     16383.926 : ArF_IF_AE_Rev_OP
+     16380.737 : ArF_IF_AE_Rev_TA
+     16380.291 : ArF_FM_NT_Rev_En
+     16375.544 : ArF_FM_AE_Rev_TA
+     16289.547 : Amp_ROP_AE_SN_OP
+     16283.590 : RoT_ROP_AE_SN_OP
+     16218.887 : RoT_ROP_NT_SN_OP
+     16210.822 : Amp_ROP_NT_SN_OP
+     16178.221 : RoT_ROP_AE_SN_TA
+     16159.426 : RoT_ROP_NT_SN_TA
+     16123.711 : Amp_ROP_AE_SN_TA
+     16113.605 : Amp_ROP_NT_SN_TA
+     16099.706 : RoT_ROP_NT_SN_En
+     16099.279 : Amp_ROP_NT_SN_En
+     16088.277 : ArF_FM_NT_Rev_TA
+     16068.405 : RoT_IF_NT_Rev_En
+     16067.502 : ArF_IF_NT_Rev_TA
+     16054.386 : ArF_IF_NT_Rev_OP
+     16048.264 : ArF_FM_NT_Rev_OP
+     16040.759 : RoT_FM_NT_Rev_En
+     16039.075 : Amp_ROP_AE_SN_En
+     16022.285 : RoT_ROP_AE_SN_En
+     16020.898 : Amp_IF_NT_Rev_En
+     16009.111 : Amp_FM_NT_Rev_En
+     15928.638 : Amp_FM_AE_Rev_TA
+     15901.719 : Amp_IF_AE_Rev_TA
+     15896.328 : Amp_IF_AE_Rev_OP
+     15891.386 : RoT_FM_NT_Rev_OP
+     15890.210 : RoT_IF_AE_Rev_TA
+     15885.470 : Amp_FM_AE_Rev_OP
+     15884.058 : Amp_FM_NT_Rev_TA
+     15883.786 : RoT_FM_AE_Rev_OP
+     15883.131 : RoT_IF_AE_Rev_OP
+     15873.751 : RoT_FM_NT_Rev_TA
+     15871.348 : RoT_FM_AE_Rev_TA
+     15865.125 : Amp_FM_NT_Rev_OP
+     15861.837 : Amp_IF_NT_Rev_TA
+     15856.254 : Amp_IF_NT_Rev_OP
+     15850.139 : RoT_IF_NT_Rev_OP
+     15842.597 : RoT_IF_NT_Rev_TA
+     15810.334 : RoT_IF_AE_Rev_En
+     15768.832 : Amp_FM_AE_Rev_En
+     15761.898 : Amp_IF_AE_Rev_En
+     15753.391 : RoT_FM_AE_Rev_En
+     15656.300 : ArF_IF_AE_SN_OP
+     15642.521 : ArF_FM_AE_SN_OP
+     15619.078 : ArF_IF_AE_SN_TA
+     15587.104 : ArF_FM_AE_SN_TA
+     15547.991 : ArF_IF_AE_SN_En
+     15533.380 : ArF_FM_AE_SN_En
+     15424.937 : ArF_IF_NT_SN_OP
+     15402.271 : ArF_FM_NT_SN_OP
+     15400.324 : ArF_FM_NT_SN_TA
+     15389.923 : ArF_IF_NT_SN_TA
+     15355.808 : ArF_IF_NT_SN_En
+     15354.453 : ArF_FM_NT_SN_En
+     15217.311 : RoT_IF_AE_SN_OP
+     15210.751 : RoT_FM_AE_SN_OP
+     15173.478 : RoT_IF_AE_SN_TA
+     15169.657 : Amp_IF_AE_SN_OP
+     15163.917 : Amp_IF_AE_SN_TA
+     15161.983 : Amp_FM_AE_SN_OP
+     15161.719 : Amp_FM_AE_SN_TA
+     15150.725 : RoT_FM_NT_SN_TA
+     15148.219 : RoT_IF_NT_SN_TA
+     15147.191 : Amp_FM_NT_SN_OP
+     15142.207 : RoT_FM_NT_SN_OP
+     15140.435 : Amp_IF_NT_SN_TA
+     15139.844 : RoT_FM_AE_SN_TA
+     15137.769 : Amp_FM_NT_SN_TA
+     15126.410 : Amp_IF_NT_SN_OP
+     15123.873 : RoT_IF_NT_SN_OP
+     15058.974 : Amp_IF_AE_SN_En
+     15044.151 : RoT_FM_AE_SN_En
+     15043.301 : RoT_IF_NT_SN_En
+     15042.284 : RoT_IF_AE_SN_En
+     15041.447 : RoT_FM_NT_SN_En
+     15027.984 : Amp_FM_NT_SN_En
+     15026.495 : Amp_FM_AE_SN_En
+     15016.021 : Amp_IF_NT_SN_En
 
 
 Baseline Performance:
   No-Networking = true
   RNG Engine    = xoshiro256+
-  Iterations    = 309 (83, 81, 81, 64)
-  TotalEvents   = 215384296
-  MaxEventQueue = 26
-  TargetHealth  = 755477
-  SimSeconds    = 91326.422
-  CpuSeconds    = 139.796875
-  WallSeconds   = 35.977577600000004
-  InitSeconds   = 2.0349908
-  MergeSeconds  = 0.2138363
-  AnalyzeSeconds= 0.054959600000000004
-  SpeedUp       = 662
-  EndTime       = 2020-09-16 01:39:30-0400 (1600234770)
+  Iterations    = 309 (79, 79, 71, 80)
+  TotalEvents   = 222313790
+  MaxEventQueue = 25
+  TargetHealth  = 1086774
+  SimSeconds    = 91588.293
+  CpuSeconds    = 145.015625
+  WallSeconds   = 37.158466600000004
+  InitSeconds   = 2.0330549
+  MergeSeconds  = 0.20636300000000002
+  AnalyzeSeconds= 0.0544557
+  SpeedUp       = 640
+  EndTime       = 2020-09-18 01:24:52-0400 (1600406692)
 
 
 Waiting:
