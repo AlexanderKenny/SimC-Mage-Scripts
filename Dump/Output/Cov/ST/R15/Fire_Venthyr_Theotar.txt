@@ -9,15 +9,15 @@
  * Beta! Beta! Beta! Beta! Beta! Beta! 
 
 DPS Ranking:
-   6024 100.0%  Raid
-   6024  100.0%  fire
+   6084 100.0%  Raid
+   6084  100.0%  fire
 
 HPS Ranking:
       0 100.0%%  Raid
 
 Player: fire troll mage fire 60
-  DPS=6023.527367179785 DPS-Error=11.598217328015426/0.19% DPS-Range=593.8620185560749/9.86%
-  DPR=7.933609068696267 RPS-Out=750.8790559995053 RPS-In=746.1768089805479 Resource=mana Waiting=0.00012083472361235022 ApM=50.22150907985041
+  DPS=6083.783762233226 DPS-Error=11.862096246763352/0.19% DPS-Range=623.6802245941931/10.25%
+  DPR=7.917623893207267 RPS-Out=760.0810717836072 RPS-In=754.6935966509955 Resource=mana Waiting=0.0001324018702876354 ApM=51.023443949005475
   Talents: 3032023
   Covenant: venthyr
   Core Stats:    strength=199|199(199)  agility=308|308(308)  stamina=434|414(414)  intellect=2569|2447(2447)  spirit=0|0(0)  health=8680|8280  mana=50000|50000
@@ -28,13 +28,15 @@ Player: fire troll mage fire 60
   Priorities (actions.precombat):
     flask/food/augmentation/arcane_intellect/variable,name=disable_combustion,op=reset
     variable,name=hot_streak_flamestrike,op=set,if=variable.hot_streak_flamestrike=0,value=2*talent.flame_patch.enabled+3*!talent.flame_patch.enabled
-    variable,name=hard_cast_flamestrike,op=set,if=variable.hard_cast_flamestrike=0,value=2*talent.flame_patch.enabled+99*!talent.flame_patch.enabled
+    variable,name=hard_cast_flamestrike,op=set,if=variable.hard_cast_flamestrike=0,value=2*talent.flame_patch.enabled+3*!talent.flame_patch.enabled
+    variable,name=combustion_flamestrike,op=set,if=variable.combustion_flamestrike=0,value=3*talent.flame_patch.enabled+6*!talent.flame_patch.enabled
     variable,name=delay_flamestrike,default=0,op=reset/variable,name=kindling_reduction,default=0.2,op=reset
     variable,name=shifting_power_reduction,op=set,value=action.shifting_power.cast_time%action.shifting_power.tick_time*3,if=covenant.night_fae.enabled
     snapshot_stats/mirror_image/potion/pyroblast
   Priorities (actions.default):
     counterspell,if=!runeforge.disciplinary_command.equipped
     variable,name=time_to_combustion,op=set,value=talent.firestarter.enabled*firestarter.remains+(cooldown.combustion.remains*(1-variable.kindling_reduction*talent.kindling.enabled))*!cooldown.combustion.ready*buff.combustion.down
+    cycling_variable,name=ignite_min,op=min,value=dot.ignite.tick_dmg
     shifting_power,if=buff.combustion.down&buff.rune_of_power.down&cooldown.combustion.remains>0&(cooldown.rune_of_power.remains>0|!talent.rune_of_power.enabled)
     radiant_spark,if=(buff.combustion.down&buff.rune_of_power.down&(cooldown.combustion.remains<execute_time|cooldown.combustion.remains>cooldown.radiant_spark.duration))|(buff.rune_of_power.up&cooldown.combustion.remains>30)
     deathborne,if=buff.combustion.down&buff.rune_of_power.down&cooldown.combustion.remains<execute_time
@@ -46,18 +48,18 @@ Player: fire troll mage fire 60
     call_action_list,name=combustion_phase,if=!variable.disable_combustion&variable.time_to_combustion<=0
     variable,name=fire_blast_pooling,value=!variable.disable_combustion&variable.time_to_combustion<action.fire_blast.full_recharge_time-variable.shifting_power_reduction*(cooldown.shifting_power.remains<variable.time_to_combustion)&variable.time_to_combustion<target.time_to_die|runeforge.sun_kings_blessing.equipped&action.fire_blast.charges_fractional<action.fire_blast.max_charges-0.5&(cooldown.shifting_power.remains>15|!covenant.night_fae.enabled)
     call_action_list,name=rop_phase,if=buff.rune_of_power.up&(variable.time_to_combustion>0|variable.disable_combustion)
-    variable,name=phoenix_pooling,value=!variable.disable_combustion&variable.time_to_combustion<action.phoenix_flames.full_recharge_time&variable.time_to_combustion<target.time_to_die
+    variable,name=phoenix_pooling,value=!variable.disable_combustion&variable.time_to_combustion<action.phoenix_flames.full_recharge_time&variable.time_to_combustion<target.time_to_die|runeforge.sun_kings_blessing.equipped
     fire_blast,use_off_gcd=1,use_while_casting=1,if=!variable.fire_blast_pooling&(variable.time_to_combustion>0|variable.disable_combustion)&(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&!buff.hot_streak.react
     fire_blast,use_off_gcd=1,use_while_casting=1,if=firestarter.active&charges>=1&!variable.fire_blast_pooling&(!action.fireball.executing&!action.pyroblast.in_flight&buff.heating_up.react|action.fireball.executing&!buff.hot_streak.react|action.pyroblast.in_flight&buff.heating_up.react&!buff.hot_streak.react)
-    call_action_list,name=standard_rotation,if=variable.time_to_combustion>0|variable.disable_combustion
+    call_action_list,name=standard_rotation,if=(variable.time_to_combustion>0|variable.disable_combustion)&buff.rune_of_power.down
   Priorities (actions.combustion_phase):
     lights_judgment,if=buff.combustion.down
     variable,name=extended_combustion_remains,op=set,value=buff.combustion.remains+buff.combustion.duration*(cooldown.combustion.remains<buff.combustion.remains)
     variable,name=extended_combustion_remains,op=add,value=6,if=buff.sun_kings_blessing_ready.up|variable.extended_combustion_remains>1.5*gcd.max*(buff.sun_kings_blessing.max_stack-buff.sun_kings_blessing.stack)
     bag_of_tricks,if=buff.combustion.down/living_bomb,if=active_enemies>1&buff.combustion.down
     mirrors_of_torment,if=buff.combustion.down&buff.rune_of_power.down
-    fire_blast,use_off_gcd=1,use_while_casting=1,if=conduit.infernal_cascade.enabled&charges>=1&((action.fire_blast.charges_fractional+(variable.extended_combustion_remains-buff.infernal_cascade.duration)%cooldown.fire_blast.duration-variable.extended_combustion_remains%(buff.infernal_cascade.duration-0.5))>=0|variable.extended_combustion_remains<=buff.infernal_cascade.duration|buff.infernal_cascade.remains<0.5)&buff.combustion.up&!buff.firestorm.react&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react<2
-    fire_blast,use_off_gcd=1,use_while_casting=1,if=!conduit.infernal_cascade.enabled&charges>=1&buff.combustion.up&!buff.firestorm.react&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react<2
+    fire_blast,use_off_gcd=1,use_while_casting=1,if=(active_enemies<=active_dot.ignite|!cooldown.phoenix_flames.ready)&conduit.infernal_cascade.enabled&charges>=1&((action.fire_blast.charges_fractional+(variable.extended_combustion_remains-buff.infernal_cascade.duration)%cooldown.fire_blast.duration-variable.extended_combustion_remains%(buff.infernal_cascade.duration-0.5))>=0|variable.extended_combustion_remains<=buff.infernal_cascade.duration|buff.infernal_cascade.remains<0.5)&buff.combustion.up&!buff.firestorm.react&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react<2
+    fire_blast,use_off_gcd=1,use_while_casting=1,if=(active_enemies<=active_dot.ignite|!cooldown.phoenix_flames.ready)&!conduit.infernal_cascade.enabled&charges>=1&buff.combustion.up&!buff.firestorm.react&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react<2
     counterspell,if=runeforge.disciplinary_command.equipped&buff.disciplinary_command.down&buff.disciplinary_command_arcane.down&cooldown.buff_disciplinary_command.ready
     arcane_explosion,if=runeforge.disciplinary_command.equipped&buff.disciplinary_command.down&buff.disciplinary_command_arcane.down&cooldown.buff_disciplinary_command.ready
     frostbolt,if=runeforge.disciplinary_command.equipped&buff.disciplinary_command.down&buff.disciplinary_command_frost.down
@@ -67,25 +69,24 @@ Player: fire troll mage fire 60
     berserking,if=buff.combustion.last_expire<=action.combustion.last_used/fireblood,if=buff.combustion.last_expire<=action.combustion.last_used
     ancestral_call,if=buff.combustion.last_expire<=action.combustion.last_used
     use_items,if=buff.combustion.last_expire<=action.combustion.last_used
-    flamestrike,if=((talent.flame_patch.enabled&active_enemies>2)|active_enemies>6)&buff.hot_streak.react
+    flamestrike,if=buff.hot_streak.react&active_enemies>=variable.combustion_flamestrike
     pyroblast,if=buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time/pyroblast,if=buff.firestorm.react
     pyroblast,if=buff.pyroclasm.react&buff.pyroclasm.remains>cast_time&(buff.combustion.remains>cast_time|buff.combustion.down)
     pyroblast,if=buff.hot_streak.react&buff.combustion.up/pyroblast,if=prev_gcd.1.scorch&buff.heating_up.react
-    phoenix_flames,if=buff.combustion.up&!buff.hot_streak.react&hot_streak_spells_in_flight+buff.heating_up.react<2
-    fireball,if=buff.combustion.down&cooldown.combustion.remains<cast_time
+    phoenix_flames,if=buff.combustion.up/fireball,if=buff.combustion.down&cooldown.combustion.remains<cast_time&!conduit.flame_accretion.enabled
     scorch,if=buff.combustion.remains>cast_time&buff.combustion.up|buff.combustion.down&cooldown.combustion.remains<cast_time
     living_bomb,if=buff.combustion.remains<gcd.max&active_enemies>1/dragons_breath,if=buff.combustion.remains<gcd.max&buff.combustion.up
     scorch,if=target.health.pct<=30&talent.searing_touch.enabled
   Priorities (actions.rop_phase):
     flamestrike,if=(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&buff.hot_streak.react
-    pyroblast,if=buff.sun_kings_blessing_ready.up&(buff.sun_kings_blessing.remains<execute_time+3|buff.rune_of_power.remains-6<execute_time+3|action.fire_blast.full_recharge_time<execute_time)
-    pyroblast,if=buff.firestorm.react/pyroblast,if=buff.hot_streak.react
+    pyroblast,if=buff.sun_kings_blessing_ready.up&buff.sun_kings_blessing_ready.remains>cast_time/pyroblast,if=buff.firestorm.react
+    pyroblast,if=buff.hot_streak.react
     fire_blast,use_off_gcd=1,use_while_casting=1,if=buff.sun_kings_blessing_ready.down&!(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&(!buff.heating_up.react&!buff.hot_streak.react&!prev_off_gcd.fire_blast&(action.fire_blast.charges>=2|(talent.alexstraszas_fury.enabled&cooldown.dragons_breath.ready)|(talent.searing_touch.enabled&target.health.pct<=30)))
-    call_action_list,name=active_talents/pyroblast,if=buff.pyroclasm.react&cast_time<buff.pyroclasm.remains&buff.rune_of_power.remains>cast_time
-    fire_blast,use_off_gcd=1,use_while_casting=1,if=buff.sun_kings_blessing_ready.down&!(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&(buff.heating_up.react&(target.health.pct>=30|!talent.searing_touch.enabled))
-    fire_blast,use_off_gcd=1,use_while_casting=1,if=buff.sun_kings_blessing_ready.down&!(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&!firestarter.active&talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.heating_up.react&!buff.hot_streak.react)
+    fire_blast,use_off_gcd=1,use_while_casting=1,if=!firestarter.active&(((action.fireball.executing|action.pyroblast.executing)&buff.heating_up.react)|(talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.hot_streak.react&!buff.heating_up.react&action.scorch.executing&!hot_streak_spells_in_flight)))
+    call_action_list,name=active_talents
+    pyroblast,if=buff.pyroclasm.react&cast_time<buff.pyroclasm.remains&cast_time<buff.rune_of_power.remains&(buff.pyroclasm.react=buff.pyroclasm.max_stack|buff.pyroclasm.remains<cast_time+action.fireball.execute_time|buff.alexstraszas_fury.up|!runeforge.sun_kings_blessing.equipped)
     pyroblast,if=prev_gcd.1.scorch&buff.heating_up.react&talent.searing_touch.enabled&target.health.pct<=30&!(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
-    phoenix_flames,if=!variable.phoenix_pooling&buff.heating_up.react&!buff.hot_streak.react
+    phoenix_flames,if=!variable.phoenix_pooling&buff.heating_up.react&!buff.hot_streak.react&(active_dot.ignite<2|active_enemies>=variable.hard_cast_flamestrike|active_enemies>=variable.hot_streak_flamestrike)
     scorch,if=target.health.pct<=30&talent.searing_touch.enabled/dragons_breath,if=active_enemies>2
     flamestrike,if=(active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
     fireball
@@ -93,13 +94,13 @@ Player: fire troll mage fire 60
     flamestrike,if=(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))&buff.hot_streak.react
     pyroblast,if=buff.firestorm.react/pyroblast,if=buff.hot_streak.react&buff.hot_streak.remains<action.fireball.execute_time
     pyroblast,if=buff.hot_streak.react&(prev_gcd.1.fireball|firestarter.active|action.pyroblast.in_flight)
-    pyroblast,if=buff.sun_kings_blessing_ready.up&(cooldown.rune_of_power.remains+action.rune_of_power.execute_time>buff.sun_kings_blessing_ready.remains+cast_time|!talent.rune_of_power.enabled)&variable.time_to_combustion>buff.sun_kings_blessing_ready.remains+cast_time
+    pyroblast,if=buff.sun_kings_blessing_ready.up&(cooldown.rune_of_power.remains+action.rune_of_power.execute_time+cast_time>buff.sun_kings_blessing_ready.remains|!talent.rune_of_power.enabled)&variable.time_to_combustion+cast_time>buff.sun_kings_blessing_ready.remains
     pyroblast,if=buff.hot_streak.react&target.health.pct<=30&talent.searing_touch.enabled
-    pyroblast,if=buff.pyroclasm.react&cast_time<buff.pyroclasm.remains
+    pyroblast,if=buff.pyroclasm.react&cast_time<buff.pyroclasm.remains&(buff.pyroclasm.react=buff.pyroclasm.max_stack|buff.pyroclasm.remains<cast_time+action.fireball.execute_time|buff.alexstraszas_fury.up|!runeforge.sun_kings_blessing.equipped)
     fire_blast,use_off_gcd=1,use_while_casting=1,if=!firestarter.active&!variable.fire_blast_pooling&(((action.fireball.executing|action.pyroblast.executing)&buff.heating_up.react)|(talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.hot_streak.react&!buff.heating_up.react&action.scorch.executing&!hot_streak_spells_in_flight)))
     pyroblast,if=prev_gcd.1.scorch&buff.heating_up.react&talent.searing_touch.enabled&target.health.pct<=30&!(active_enemies>=variable.hot_streak_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion))
-    phoenix_flames,if=!variable.phoenix_pooling&(!talent.from_the_ashes.enabled|active_enemies>1)/call_action_list,name=active_talents
-    dragons_breath,if=active_enemies>1/scorch,if=target.health.pct<=30&talent.searing_touch.enabled
+    phoenix_flames,if=!variable.phoenix_pooling&(!talent.from_the_ashes.enabled|active_enemies>1)&(active_dot.ignite<2|active_enemies>=variable.hard_cast_flamestrike|active_enemies>=variable.hot_streak_flamestrike)
+    call_action_list,name=active_talents/dragons_breath,if=active_enemies>1/scorch,if=target.health.pct<=30&talent.searing_touch.enabled
     flamestrike,if=active_enemies>=variable.hard_cast_flamestrike&(time-buff.combustion.last_expire>variable.delay_flamestrike|variable.disable_combustion)
     fireball/scorch
   Priorities (actions.active_talents):
@@ -107,54 +108,54 @@ Player: fire troll mage fire 60
     meteor,if=!variable.disable_combustion&variable.time_to_combustion<=0|(cooldown.meteor.duration<variable.time_to_combustion&!talent.rune_of_power.enabled)|talent.rune_of_power.enabled&buff.rune_of_power.up&variable.time_to_combustion>action.meteor.cooldown|target.time_to_die<variable.time_to_combustion|variable.disable_combustion
     dragons_breath,if=talent.alexstraszas_fury.enabled&(buff.combustion.down&!buff.hot_streak.react)
   Actions:
-    agonizing_backlash      Count=   5.8| 49.335sec  DPE= 6123| 1.99%  DPET=   0  DPR=   0  pDPS= 120  Miss= 0.00%  Crit=  6123|  6123|  6123|100.00%
-    berserking              Count=   1.9|246.036sec  DPE=    0| 0.00%  DPET=   0  DPR=   0  pDPS=   0
-    combustion              Count=   2.9|123.178sec  DPE=    0| 0.00%  DPET=   0  DPR=   0  pDPS=   0
-    conflagration           Count=  65.5|  2.987sec  DPE=  141| 0.51%  DPET=   0  DPR=   0  pDPS=  31  TickCount=   119  MissTick= 0.00%  Tick=    54|     0|    67  CritTick=   110|     0|   135|41.96%  UpTime= 64.62%
-    conflagration_flare_up  Count=  29.9|  9.690sec  DPE=  337| 0.56%  DPET=   0  DPR=   0  pDPS=  34  Miss= 0.00%  Hit=   222|   197|   276  Crit=   471|   394|   551|46.07%
-    dragons_breath          Count=  14.6| 20.210sec  DPE= 5117| 4.15%  DPET=4179  DPR=   3  pDPS= 250  Miss= 0.00%  Crit=  5117|  4246|  5945|100.00%
-    fire_blast              Count=  31.9|  9.460sec  DPE= 5112| 9.06%  DPET=   0  DPR=  10  pDPS= 546  Miss= 0.00%  Crit=  5112|  4199|  5879|100.00%
-    fireball                Count=  65.5|  2.987sec  DPE= 3422|11.95%  DPET=1879  DPR=   3  pDPS= 718  Miss= 0.00%  Hit=  2233|  1978|  2770  Crit=  4456|  3957|  5540|47.16%
-    ignite                  Count= 220.9|  1.353sec  DPE= 1576|19.35%  DPET=   0  DPR=   0  pDPS=1164  TickCount=   298  MissTick= 0.00%  Tick=  1169|    76|  3385  UpTime= 99.57%
-    meteor                  Count=   5.7| 58.717sec  DPE=21634| 0.00%  DPET=17703  DPR=  43  pDPS=   0
-    meteor_burn             Count=  44.2|  6.460sec  DPE=  558| 1.37%  DPET=   0  DPR=   0  pDPS=  83  MissTick= 0.00%  Tick=   312|   241|   337  CritTick=   661|   481|   674|70.74%
-    meteor_impact           Count=   5.7| 58.914sec  DPE=17421| 5.48%  DPET=   0  DPR=   0  pDPS= 331  Miss= 0.00%  Hit=  9744|  7581| 10614  Crit= 20802| 15163| 21228|70.23%
-    mirror_image            Count=   3.0|120.418sec  DPE= 5796| 0.00%  DPET=6839  DPR=   9  pDPS=   0
-    mirrors_of_torment      Count=   2.9|122.868sec  DPE=28056| 0.00%  DPET=22034  DPR=  14  pDPS=   0
-    phoenix_flames          Count=  14.2| 21.483sec  DPE= 5957| 0.00%  DPET=5180  DPR=   0  pDPS=   0
-    phoenix_flames_splash   Count=  14.1| 21.452sec  DPE= 5972| 4.69%  DPET=   0  DPR=   0  pDPS= 283  Miss= 0.00%  Hit=  2717|  2624|  3674  Crit=  6976|  5249|  7348|76.43%
-    pyroblast               Count=  72.0|  4.145sec  DPE= 8117|29.53%  DPET=6761  DPR=   8  pDPS=1780  Miss= 0.00%  Hit=  4548|  3613|  6828  Crit=  9579|  7226| 13657|54.62%
-    pyroblast_dot           Count=  72.0|  4.145sec  DPE=  743| 2.97%  DPET=   0  DPR=   0  pDPS= 179  TickCount=   175  MissTick= 0.00%  Tick=   198|     0|   253  CritTick=   427|     0|   506|46.96%  UpTime= 90.70%
-    rune_of_power           Count=   5.3| 59.422sec  DPE=    0| 0.00%  DPET=   0  DPR=   0  pDPS=   0
-    scorch                  Count=  30.9|  9.561sec  DPE= 2797| 4.81%  DPET=2246  DPR=   6  pDPS= 290  Miss= 0.00%  Crit=  2797|  1445|  3613|100.00%
-    tormenting_backlash     Count=   2.9|122.885sec  DPE=16166| 2.60%  DPET=   0  DPR=   0  pDPS= 157  Miss= 0.00%  Crit= 16166| 16166| 16166|100.00%
-   mirror_image (DPS=153.39146692720922)
-    frostbolt               Count= 221.2|  3.705sec  DPE=   78| 0.96%  DPET=  52  DPR=   0  pDPS= 153  Miss= 0.00%  Hit=    57|    43|    61  Crit=   113|    87|   121|38.87%
+    agonizing_backlash      Count=   5.8| 50.375sec  DPE= 4899| 1.56%  DPET=   0  DPR=   0  pDPS=  96  Miss= 0.00%  Crit=  4899|  4899|  4899|100.00%
+    berserking              Count=   1.9|245.999sec  DPE=    0| 0.00%  DPET=   0  DPR=   0  pDPS=   0
+    combustion              Count=   2.9|123.162sec  DPE=    0| 0.00%  DPET=   0  DPR=   0  pDPS=   0
+    conflagration           Count=  65.2|  3.004sec  DPE=  142| 0.51%  DPET=   0  DPR=   0  pDPS=  31  TickCount=   119  MissTick= 0.00%  Tick=    54|     0|    67  CritTick=   110|     0|   135|42.38%  UpTime= 64.26%
+    conflagration_flare_up  Count=  29.9|  9.567sec  DPE=  337| 0.55%  DPET=   0  DPR=   0  pDPS=  34  Miss= 0.00%  Hit=   222|   197|   276  Crit=   472|   394|   551|45.93%
+    dragons_breath          Count=  14.6| 20.199sec  DPE= 5089| 4.09%  DPET=4156  DPR=   3  pDPS= 248  Miss= 0.00%  Crit=  5089|  4246|  5945|100.00%
+    fire_blast              Count=  35.7|  8.455sec  DPE= 5195|10.18%  DPET=   0  DPR=  10  pDPS= 619  Miss= 0.00%  Crit=  5195|  4199|  5879|100.00%
+    fireball                Count=  65.2|  3.004sec  DPE= 3416|11.70%  DPET=1873  DPR=   3  pDPS= 710  Miss= 0.00%  Hit=  2228|  1978|  2770  Crit=  4450|  3957|  5540|47.07%
+    ignite                  Count= 225.6|  1.330sec  DPE= 1604|19.85%  DPET=   0  DPR=   0  pDPS=1207  TickCount=   299  MissTick= 0.00%  Tick=  1212|    76|  3511  UpTime= 99.57%
+    meteor                  Count=   5.7| 58.644sec  DPE=21625| 0.00%  DPET=17691  DPR=  43  pDPS=   0
+    meteor_burn             Count=  44.4|  6.435sec  DPE=  557| 1.36%  DPET=   0  DPR=   0  pDPS=  83  MissTick= 0.00%  Tick=   312|   241|   337  CritTick=   660|   481|   674|70.47%
+    meteor_impact           Count=   5.7| 58.873sec  DPE=17415| 5.45%  DPET=   0  DPR=   0  pDPS= 332  Miss= 0.00%  Hit=  9749|  7581| 10614  Crit= 20762| 15163| 21228|70.22%
+    mirror_image            Count=   3.0|120.426sec  DPE= 5791| 0.00%  DPET=6834  DPR=   9  pDPS=   0
+    mirrors_of_torment      Count=   2.9|122.848sec  DPE=17893| 0.00%  DPET=14051  DPR=   9  pDPS=   0
+    phoenix_flames          Count=  14.1| 21.409sec  DPE= 5926| 0.00%  DPET=5154  DPR=   0  pDPS=   0
+    phoenix_flames_splash   Count=  14.1| 21.407sec  DPE= 5942| 4.60%  DPET=   0  DPR=   0  pDPS= 280  Miss= 0.00%  Hit=  2687|  2624|  3674  Crit=  6973|  5249|  7348|75.95%
+    pyroblast               Count=  74.4|  4.042sec  DPE= 8158|30.34%  DPET=6811  DPR=   8  pDPS=1847  Miss= 0.00%  Hit=  4532|  3613|  6828  Crit=  9609|  7226| 13657|55.68%
+    pyroblast_dot           Count=  74.4|  4.042sec  DPE=  723| 2.95%  DPET=   0  DPR=   0  pDPS= 179  TickCount=   175  MissTick= 0.00%  Tick=   199|     0|   253  CritTick=   429|     1|   506|46.80%  UpTime= 91.44%
+    rune_of_power           Count=   5.2| 59.153sec  DPE=    0| 0.00%  DPET=   0  DPR=   0  pDPS=   0
+    scorch                  Count=  29.9|  9.876sec  DPE= 2805| 4.60%  DPET=2241  DPR=   6  pDPS= 280  Miss= 0.00%  Crit=  2805|  1445|  3613|100.00%
+    tormenting_backlash     Count=   2.8|122.836sec  DPE= 8613| 1.33%  DPET=   0  DPR=   0  pDPS=  81  Miss= 0.00%  Hit=  6164|  6164|  6164  Crit= 12329| 12329| 12329|39.73%
+   mirror_image (DPS=153.53580554132412)
+    frostbolt               Count= 220.8|  3.721sec  DPE=   78| 0.95%  DPET=  52  DPR=   0  pDPS= 154  Miss= 0.00%  Hit=    57|    43|    61  Crit=   113|    87|   121|39.09%
 
   Constant Buffs:
     arcane_intellect/battle_shout/power_word_fortitude
   Dynamic Buffs:
-    alexstraszas_fury : start= 14.6 refresh=  0.0 interval= 20.2 trigger= 20.2 duration=  3.5 uptime= 16.83%
-    berserking        : start=  1.9 refresh=  0.0 interval=246.1 trigger=246.1 duration= 11.7 uptime=  7.55%  benefit= 21.68%
-    bloodlust         : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 40.0 uptime= 13.55%
-    combustion        : start=  2.9 refresh=  0.0 interval=123.2 trigger=123.2 duration= 11.8 uptime= 11.62%
-    fireball          : start= 19.6 refresh= 15.0 interval= 10.0 trigger=  5.6 duration=  5.5 uptime= 36.32%
-    heating_up        : start= 82.1 refresh=  0.0 interval=  3.6 trigger=  3.6 duration=  1.2 uptime= 32.82%  benefit= 46.63%
-    hot_streak        : start= 72.1 refresh=  0.0 interval=  4.1 trigger=  4.1 duration=  1.2 uptime= 20.92%  benefit= 98.62%
-    rune_of_power     : start=  8.2 refresh=  0.0 interval= 38.5 trigger= 38.5 duration= 14.6 uptime= 39.91%
+    alexstraszas_fury : start= 14.6 refresh=  0.0 interval= 20.2 trigger= 20.2 duration=  3.6 uptime= 17.69%
+    berserking        : start=  1.9 refresh=  0.0 interval=246.0 trigger=246.0 duration= 11.6 uptime=  7.52%  benefit= 21.73%
+    bloodlust         : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 40.0 uptime= 13.52%
+    combustion        : start=  2.9 refresh=  0.0 interval=123.2 trigger=123.2 duration= 11.8 uptime= 11.59%
+    fireball          : start= 19.5 refresh= 15.0 interval= 10.1 trigger=  5.6 duration=  5.6 uptime= 36.24%
+    heating_up        : start= 84.3 refresh=  0.0 interval=  3.6 trigger=  3.6 duration=  1.2 uptime= 32.64%  benefit= 46.87%
+    hot_streak        : start= 74.5 refresh=  0.0 interval=  4.0 trigger=  4.0 duration=  1.2 uptime= 21.94%  benefit= 98.66%
+    rune_of_power     : start=  8.2 refresh=  0.0 interval= 38.6 trigger= 38.6 duration= 14.6 uptime= 39.77%
   Up-Times:
-     11.66% : Mana Cap                      
+     12.06% : Mana Cap                      
   Procs:
-     82.13640 |   3.64793sec : Heating Up generated
-      9.56820 |  27.16374sec : Heating Up removed
-     21.71725 |  13.28765sec : Heating Up converted with Fire Blast
-     72.14815 |   4.14092sec : Hot Streak procs
-    229.85456 |   1.30239sec : Hot Streak spells used
-    158.86540 |   1.88364sec : Hot Streak spell crits
-      4.58085 |  48.85561sec : Hot Streak spell crits wasted
+     84.31281 |   3.56431sec : Heating Up generated
+      9.40914 |  26.93921sec : Heating Up removed
+     22.69017 |  12.90165sec : Heating Up converted with Fire Blast
+     74.48957 |   4.02322sec : Hot Streak procs
+    234.61569 |   1.27852sec : Hot Streak spells used
+    163.43694 |   1.83362sec : Hot Streak spell crits
+      4.63456 |  49.29057sec : Hot Streak spell crits wasted
       1.00000 |   0.00000sec : Direct Ignite applications
   Gains:
-    223143.0 : mana_regen (mana)           (overflow=25.27%)
+    226426.0 : mana_regen (mana)           (overflow=24.42%)
     Pet "mirror_image" Gains:
   Waiting:  0.00%
 
@@ -162,10 +163,10 @@ Player: fire troll mage fire 60
  *** Targets *** 
 
 Target: Fluffy_Pillow humanoid enemy unknown 63
-  DTPS=6023.527367179788 DTPS-Error=11.598217328015355/0.19% DTPS-Range=593.8620185560703/9.86%
-  DPR=0.0 RPS-Out=5666.36364250186 RPS-In=0.0 Resource=health Waiting=0.0 ApM=0.0
+  DTPS=6083.783762233225 DTPS-Error=11.862096246763313/0.19% DTPS-Range=623.6802245941944/10.25%
+  DPR=0.0 RPS-Out=5747.291076180105 RPS-In=0.0 Resource=health Waiting=0.0 ApM=0.0
   Talents: 0000000
-  Core Stats:    strength=0|0(0)  agility=0|0(0)  stamina=0|0(0)  intellect=0|0(0)  spirit=0|0(0)  health=0|1859315  mana=0|0
+  Core Stats:    strength=0|0(0)  agility=0|0(0)  stamina=0|0(0)  intellect=0|0(0)  spirit=0|0(0)  health=0|2072756  mana=0|0
   Generic Stats: mastery=0.00%|0.00%(0)  versatility=0.00%|0.00%(0)  leech=0.00%|0.00%(0)  runspeed=7.00%|7.00%(0)
   Spell Stats:   power=0|0(0)  hit=0.00%|0.00%(0)  crit=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%  manareg=0|0(0)
   Attack Stats:  power=0|0(0)  hit=0.00%|0.00%(0)  crit=5.00%|5.00%(0)  expertise=0.00%|0.00%(0)  haste=0.00%|0.00%(0)  speed=0.00%|0.00%
@@ -179,138 +180,138 @@ Target: Fluffy_Pillow humanoid enemy unknown 63
   Constant Buffs:
     arcane_intellect/battle_shout/bleeding/chaos_brand/mortal_wounds/mystic_touch/power_word_fortitude
   Dynamic Buffs:
-    Health Decade (0 - 10)   : start=  0.7 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 45.4 uptime= 10.13%
-    Health Decade (10 - 20)  : start=  0.9 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 25.1 uptime=  7.44%
-    Health Decade (20 - 30)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 28.9 uptime=  9.45%
-    Health Decade (30 - 40)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 37.2 uptime= 12.55%
-    Health Decade (40 - 50)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 34.0 uptime= 11.49%
-    Health Decade (50 - 60)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 27.6 uptime=  9.34%
-    Health Decade (60 - 70)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 39.4 uptime= 13.37%
-    Health Decade (70 - 80)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 40.6 uptime= 13.74%
-    Health Decade (80 - 90)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 25.6 uptime=  8.66%
-    Health Decade (90 - 100) : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 12.3 uptime=  3.82%
-    mirrors_of_torment       : start=  2.9 refresh=  0.0 interval=122.7 trigger=122.9 duration=  5.9 uptime=  5.89%
+    Health Decade (0 - 10)   : start=  0.7 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 45.0 uptime=  9.44%
+    Health Decade (10 - 20)  : start=  0.9 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 25.1 uptime=  7.13%
+    Health Decade (20 - 30)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 29.0 uptime=  9.37%
+    Health Decade (30 - 40)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 37.0 uptime= 12.46%
+    Health Decade (40 - 50)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 35.0 uptime= 11.81%
+    Health Decade (50 - 60)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 28.6 uptime=  9.67%
+    Health Decade (60 - 70)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 39.8 uptime= 13.47%
+    Health Decade (70 - 80)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 41.8 uptime= 14.14%
+    Health Decade (80 - 90)  : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 24.9 uptime=  8.41%
+    Health Decade (90 - 100) : start=  1.0 refresh=  0.0 interval=  0.0 trigger=  0.0 duration= 13.3 uptime=  4.11%
+    mirrors_of_torment       : start=  2.9 refresh=  0.0 interval=122.6 trigger=122.9 duration= 13.2 uptime= 13.05%
   Waiting:  0.00%
 
 
 Profilesets (median Damage per Second):
-      7335.742 : WtShoes/ToApprec/LotParty/WProp/CDest:15/FAccretion:15/ICascade:15
-      7330.006 : WtShoes/ToApprec/EIngredients/WProp/CDest:15/FAccretion:15/ICascade:15
-      7180.368 : WtShoes/ToApprec/LotParty/WProp/SMalice:15/CDest:15/ICascade:15
-      7170.139 : WtShoes/ToApprec/EIngredients/WProp/SMalice:15/CDest:15/ICascade:15
-      7169.091 : WtShoes/ToApprec/LotParty/WProp/SMalice:15/CDest:15/FAccretion:15
-      7161.284 : WtShoes/ToApprec/EIngredients/WProp/SMalice:15/CDest:15/FAccretion:15
-      7142.722 : WtShoes/SShade/LotParty/WProp/CDest:15/FAccretion:15/GSurge:15
-      7134.390 : WtShoes/SShade/EIngredients/WProp/CDest:15/FAccretion:15/GSurge:15
-      7129.905 : WtShoes/SShade/LotParty/WProp/CDest:15/ICascade:15/GSurge:15
-      7111.885 : WtShoes/SShade/EIngredients/WProp/CDest:15/ICascade:15/GSurge:15
-      7062.262 : WtShoes/ToApprec/LotParty/WProp/CDest:15/MFlame:15/ICascade:15
-      7055.479 : WtShoes/ToApprec/EIngredients/WProp/CDest:15/FAccretion:15/MFlame:15
-      7054.023 : LGait/ToApprec/LotParty/WProp/CDest:15/FAccretion:15/GSurge:15
-      7046.911 : WtShoes/ToApprec/LotParty/WProp/CDest:15/FAccretion:15/MFlame:15
-      7039.666 : LGait/ToApprec/EIngredients/WProp/CDest:15/FAccretion:15/GSurge:15
-      7037.922 : WtShoes/RPalate/LotParty/WProp/CDest:15/FAccretion:15
-      7033.453 : WtShoes/ToApprec/EIngredients/WProp/CDest:15/MFlame:15/ICascade:15
-      7029.262 : WtShoes/RPalate/EIngredients/WProp/CDest:15/ICascade:15
-      7028.844 : LGait/ToApprec/LotParty/WProp/CDest:15/ICascade:15/GSurge:15
-      7025.712 : WtShoes/RPalate/EIngredients/WProp/CDest:15/FAccretion:15
-      7018.328 : LGait/ToApprec/EIngredients/WProp/CDest:15/ICascade:15/GSurge:15
-      7006.934 : WtShoes/RPalate/LotParty/WProp/CDest:15/ICascade:15
-      6946.542 : WtShoes/SShade/EIngredients/WProp/SMalice:15/CDest:15/GSurge:15
-      6935.240 : WtShoes/SShade/LotParty/WProp/SMalice:15/CDest:15/GSurge:15
-      6876.474 : WtShoes/ToApprec/EIngredients/WProp/SMalice:15/FAccretion:15/ICascade:15
-      6868.973 : WtShoes/ToApprec/LotParty/WProp/SMalice:15/FAccretion:15/ICascade:15
-      6868.905 : WtShoes/ToApprec/LotParty/WProp/SMalice:15/CDest:15/MFlame:15
-      6856.909 : LGait/ToApprec/LotParty/WProp/SMalice:15/CDest:15/GSurge:15
-      6854.335 : WtShoes/RPalate/EIngredients/WProp/SMalice:15/CDest:15
-      6846.502 : WtShoes/ToApprec/EIngredients/WProp/SMalice:15/CDest:15/MFlame:15
-      6844.800 : WtShoes/SShade/LotParty/WProp/FAccretion:15/ICascade:15/GSurge:15
-      6844.778 : LGait/ToApprec/EIngredients/WProp/SMalice:15/CDest:15/GSurge:15
-      6844.202 : WtShoes/RPalate/LotParty/WProp/SMalice:15/CDest:15
-      6842.943 : WtShoes/SShade/EIngredients/WProp/CDest:15/MFlame:15/GSurge:15
-      6841.312 : WtShoes/SShade/EIngredients/WProp/FAccretion:15/ICascade:15/GSurge:15
-      6840.163 : LGait/SShade/EIngredients/WProp/CDest:15/GSurge:15
-      6822.617 : LGait/SShade/LotParty/WProp/CDest:15/GSurge:15
-      6805.660 : WtShoes/SShade/LotParty/WProp/CDest:15/MFlame:15/GSurge:15
-      6768.048 : LGait/ToApprec/LotParty/WProp/FAccretion:15/ICascade:15/GSurge:15
-      6762.135 : LGait/ToApprec/EIngredients/WProp/FAccretion:15/ICascade:15/GSurge:15
-      6760.663 : WtShoes/RPalate/EIngredients/WProp/FAccretion:15/ICascade:15
-      6754.495 : WtShoes/ToApprec/LotParty/WProp/FAccretion:15/MFlame:15/ICascade:15
-      6754.267 : WtShoes/RPalate/LotParty/WProp/FAccretion:15/ICascade:15
-      6750.711 : LGait/ToApprec/EIngredients/WProp/CDest:15/MFlame:15/GSurge:15
-      6750.357 : WtShoes/ToApprec/EIngredients/WProp/FAccretion:15/MFlame:15/ICascade:15
-      6742.374 : LGait/RPalate/LotParty/WProp/CDest:15/GSurge:15
-      6741.262 : LGait/RPalate/EIngredients/WProp/CDest:15/GSurge:15
-      6739.862 : WtShoes/RPalate/EIngredients/WProp/CDest:15/MFlame:15
-      6728.728 : WtShoes/RPalate/LotParty/WProp/CDest:15/MFlame:15
-      6708.853 : LGait/ToApprec/LotParty/WProp/CDest:15/MFlame:15/GSurge:15
-      6686.895 : WtShoes/SShade/EIngredients/WProp/SMalice:15/FAccretion:15/GSurge:15
-      6681.296 : WtShoes/SShade/EIngredients/WProp/SMalice:15/ICascade:15/GSurge:15
-      6680.635 : WtShoes/SShade/LotParty/WProp/SMalice:15/ICascade:15/GSurge:15
-      6679.470 : WtShoes/SShade/LotParty/WProp/SMalice:15/FAccretion:15/GSurge:15
-      6611.959 : WtShoes/ToApprec/EIngredients/WProp/SMalice:15/FAccretion:15/MFlame:15
-      6608.654 : WtShoes/RPalate/LotParty/WProp/SMalice:15/ICascade:15
-      6607.240 : WtShoes/ToApprec/LotParty/WProp/SMalice:15/MFlame:15/ICascade:15
-      6604.592 : WtShoes/ToApprec/EIngredients/WProp/SMalice:15/MFlame:15/ICascade:15
-      6602.253 : WtShoes/RPalate/EIngredients/WProp/SMalice:15/FAccretion:15
-      6602.077 : LGait/ToApprec/LotParty/WProp/SMalice:15/ICascade:15/GSurge:15
-      6600.420 : LGait/ToApprec/EIngredients/WProp/SMalice:15/FAccretion:15/GSurge:15
-      6599.905 : WtShoes/RPalate/EIngredients/WProp/SMalice:15/ICascade:15
-      6594.509 : WtShoes/ToApprec/LotParty/WProp/SMalice:15/FAccretion:15/MFlame:15
-      6593.863 : LGait/ToApprec/LotParty/WProp/SMalice:15/FAccretion:15/GSurge:15
-      6589.737 : WtShoes/RPalate/LotParty/WProp/SMalice:15/FAccretion:15
-      6580.980 : LGait/SShade/EIngredients/WProp/FAccretion:15/GSurge:15
-      6580.780 : LGait/ToApprec/EIngredients/WProp/SMalice:15/ICascade:15/GSurge:15
-      6575.471 : LGait/SShade/LotParty/WProp/FAccretion:15/GSurge:15
-      6567.103 : WtShoes/SShade/LotParty/WProp/FAccretion:15/MFlame:15/GSurge:15
-      6562.443 : LGait/SShade/EIngredients/WProp/ICascade:15/GSurge:15
-      6561.612 : WtShoes/SShade/EIngredients/WProp/FAccretion:15/MFlame:15/GSurge:15
-      6559.078 : WtShoes/SShade/LotParty/WProp/MFlame:15/ICascade:15/GSurge:15
-      6559.004 : WtShoes/SShade/EIngredients/WProp/MFlame:15/ICascade:15/GSurge:15
-      6546.810 : LGait/SShade/LotParty/WProp/ICascade:15/GSurge:15
-      6501.325 : LGait/RPalate/LotParty/WProp/FAccretion:15/GSurge:15
-      6497.911 : LGait/ToApprec/EIngredients/WProp/FAccretion:15/MFlame:15/GSurge:15
-      6497.756 : LGait/RPalate/EIngredients/WProp/ICascade:15/GSurge:15
-      6494.225 : LGait/ToApprec/LotParty/WProp/MFlame:15/ICascade:15/GSurge:15
-      6493.090 : WtShoes/RPalate/LotParty/WProp/FAccretion:15/MFlame:15
-      6492.321 : WtShoes/RPalate/EIngredients/WProp/FAccretion:15/MFlame:15
-      6488.475 : LGait/ToApprec/EIngredients/WProp/MFlame:15/ICascade:15/GSurge:15
-      6481.391 : WtShoes/RPalate/EIngredients/WProp/MFlame:15/ICascade:15
-      6480.354 : LGait/RPalate/LotParty/WProp/ICascade:15/GSurge:15
-      6477.755 : LGait/RPalate/EIngredients/WProp/FAccretion:15/GSurge:15
-      6476.605 : LGait/ToApprec/LotParty/WProp/FAccretion:15/MFlame:15/GSurge:15
-      6468.203 : WtShoes/RPalate/LotParty/WProp/MFlame:15/ICascade:15
-      6419.791 : LGait/SShade/EIngredients/WProp/SMalice:15/GSurge:15
-      6415.588 : LGait/SShade/LotParty/WProp/SMalice:15/GSurge:15
-      6405.981 : WtShoes/SShade/EIngredients/WProp/SMalice:15/MFlame:15/GSurge:15
-      6398.734 : WtShoes/SShade/LotParty/WProp/SMalice:15/MFlame:15/GSurge:15
-      6334.402 : LGait/ToApprec/EIngredients/WProp/SMalice:15/MFlame:15/GSurge:15
-      6327.426 : LGait/RPalate/LotParty/WProp/SMalice:15/GSurge:15
-      6326.093 : LGait/ToApprec/LotParty/WProp/SMalice:15/MFlame:15/GSurge:15
-      6325.415 : WtShoes/RPalate/LotParty/WProp/SMalice:15/MFlame:15
-      6321.808 : LGait/RPalate/EIngredients/WProp/SMalice:15/GSurge:15
-      6304.888 : WtShoes/RPalate/EIngredients/WProp/SMalice:15/MFlame:15
-      6302.271 : LGait/SShade/LotParty/WProp/MFlame:15/GSurge:15
-      6299.081 : LGait/SShade/EIngredients/WProp/MFlame:15/GSurge:15
-      6218.417 : LGait/RPalate/EIngredients/WProp/MFlame:15/GSurge:15
-      6209.455 : LGait/RPalate/LotParty/WProp/MFlame:15/GSurge:15
+      7609.308 : WtShoes/ToApprec/EIngredients/WProp/CDest:15/FAccretion:15/ICascade:15
+      7607.034 : WtShoes/ToApprec/LotParty/WProp/CDest:15/FAccretion:15/ICascade:15
+      7406.235 : WtShoes/ToApprec/EIngredients/WProp/SMalice:15/CDest:15/ICascade:15
+      7405.072 : WtShoes/ToApprec/LotParty/WProp/SMalice:15/CDest:15/ICascade:15
+      7383.832 : WtShoes/SShade/EIngredients/WProp/CDest:15/ICascade:15/GSurge:15
+      7367.134 : WtShoes/SShade/LotParty/WProp/CDest:15/ICascade:15/GSurge:15
+      7275.179 : WtShoes/ToApprec/LotParty/WProp/CDest:15/MFlame:15/ICascade:15
+      7274.268 : LGait/ToApprec/LotParty/WProp/CDest:15/ICascade:15/GSurge:15
+      7272.377 : LGait/ToApprec/EIngredients/WProp/CDest:15/ICascade:15/GSurge:15
+      7272.132 : WtShoes/RPalate/LotParty/WProp/CDest:15/ICascade:15
+      7261.583 : WtShoes/ToApprec/LotParty/WProp/SMalice:15/CDest:15/FAccretion:15
+      7261.342 : WtShoes/ToApprec/EIngredients/WProp/CDest:15/MFlame:15/ICascade:15
+      7254.285 : WtShoes/RPalate/EIngredients/WProp/CDest:15/ICascade:15
+      7249.714 : WtShoes/ToApprec/EIngredients/WProp/SMalice:15/CDest:15/FAccretion:15
+      7235.838 : WtShoes/SShade/LotParty/WProp/CDest:15/FAccretion:15/GSurge:15
+      7234.076 : WtShoes/SShade/EIngredients/WProp/CDest:15/FAccretion:15/GSurge:15
+      7150.124 : LGait/ToApprec/LotParty/WProp/CDest:15/FAccretion:15/GSurge:15
+      7139.561 : WtShoes/RPalate/LotParty/WProp/CDest:15/FAccretion:15
+      7136.952 : WtShoes/ToApprec/EIngredients/WProp/CDest:15/FAccretion:15/MFlame:15
+      7136.280 : WtShoes/RPalate/EIngredients/WProp/CDest:15/FAccretion:15
+      7132.263 : LGait/ToApprec/EIngredients/WProp/CDest:15/FAccretion:15/GSurge:15
+      7130.896 : WtShoes/ToApprec/LotParty/WProp/CDest:15/FAccretion:15/MFlame:15
+      7103.712 : WtShoes/ToApprec/EIngredients/WProp/SMalice:15/FAccretion:15/ICascade:15
+      7102.408 : WtShoes/ToApprec/LotParty/WProp/SMalice:15/FAccretion:15/ICascade:15
+      7077.114 : WtShoes/SShade/EIngredients/WProp/FAccretion:15/ICascade:15/GSurge:15
+      7066.591 : WtShoes/SShade/LotParty/WProp/FAccretion:15/ICascade:15/GSurge:15
+      7045.066 : WtShoes/SShade/LotParty/WProp/SMalice:15/CDest:15/GSurge:15
+      7008.802 : WtShoes/SShade/EIngredients/WProp/SMalice:15/CDest:15/GSurge:15
+      6999.056 : WtShoes/RPalate/LotParty/WProp/FAccretion:15/ICascade:15
+      6996.853 : WtShoes/RPalate/EIngredients/WProp/FAccretion:15/ICascade:15
+      6994.529 : LGait/ToApprec/EIngredients/WProp/FAccretion:15/ICascade:15/GSurge:15
+      6979.738 : WtShoes/ToApprec/EIngredients/WProp/FAccretion:15/MFlame:15/ICascade:15
+      6974.250 : WtShoes/ToApprec/LotParty/WProp/FAccretion:15/MFlame:15/ICascade:15
+      6971.023 : LGait/ToApprec/LotParty/WProp/FAccretion:15/ICascade:15/GSurge:15
+      6958.232 : WtShoes/RPalate/EIngredients/WProp/SMalice:15/CDest:15
+      6945.378 : WtShoes/ToApprec/LotParty/WProp/SMalice:15/CDest:15/MFlame:15
+      6942.701 : LGait/ToApprec/LotParty/WProp/SMalice:15/CDest:15/GSurge:15
+      6941.154 : LGait/ToApprec/EIngredients/WProp/SMalice:15/CDest:15/GSurge:15
+      6938.306 : WtShoes/RPalate/LotParty/WProp/SMalice:15/CDest:15
+      6927.713 : WtShoes/ToApprec/EIngredients/WProp/SMalice:15/CDest:15/MFlame:15
+      6913.930 : WtShoes/SShade/LotParty/WProp/SMalice:15/ICascade:15/GSurge:15
+      6912.766 : LGait/SShade/LotParty/WProp/CDest:15/GSurge:15
+      6911.480 : WtShoes/SShade/LotParty/WProp/CDest:15/MFlame:15/GSurge:15
+      6908.199 : LGait/SShade/EIngredients/WProp/CDest:15/GSurge:15
+      6903.409 : WtShoes/SShade/EIngredients/WProp/CDest:15/MFlame:15/GSurge:15
+      6898.683 : WtShoes/SShade/EIngredients/WProp/SMalice:15/ICascade:15/GSurge:15
+      6837.874 : LGait/RPalate/EIngredients/WProp/CDest:15/GSurge:15
+      6831.195 : LGait/RPalate/LotParty/WProp/CDest:15/GSurge:15
+      6824.846 : WtShoes/RPalate/EIngredients/WProp/CDest:15/MFlame:15
+      6822.519 : WtShoes/RPalate/LotParty/WProp/CDest:15/MFlame:15
+      6821.808 : LGait/ToApprec/EIngredients/WProp/CDest:15/MFlame:15/GSurge:15
+      6814.725 : WtShoes/ToApprec/EIngredients/WProp/SMalice:15/MFlame:15/ICascade:15
+      6814.204 : LGait/ToApprec/EIngredients/WProp/SMalice:15/ICascade:15/GSurge:15
+      6806.881 : LGait/ToApprec/LotParty/WProp/CDest:15/MFlame:15/GSurge:15
+      6800.756 : LGait/ToApprec/LotParty/WProp/SMalice:15/ICascade:15/GSurge:15
+      6794.952 : WtShoes/RPalate/EIngredients/WProp/SMalice:15/ICascade:15
+      6791.360 : WtShoes/ToApprec/LotParty/WProp/SMalice:15/MFlame:15/ICascade:15
+      6791.285 : WtShoes/RPalate/LotParty/WProp/SMalice:15/ICascade:15
+      6779.352 : LGait/SShade/LotParty/WProp/ICascade:15/GSurge:15
+      6772.895 : WtShoes/SShade/EIngredients/WProp/MFlame:15/ICascade:15/GSurge:15
+      6767.298 : WtShoes/SShade/LotParty/WProp/MFlame:15/ICascade:15/GSurge:15
+      6762.739 : LGait/SShade/EIngredients/WProp/ICascade:15/GSurge:15
+      6760.175 : WtShoes/SShade/LotParty/WProp/SMalice:15/FAccretion:15/GSurge:15
+      6745.333 : WtShoes/SShade/EIngredients/WProp/SMalice:15/FAccretion:15/GSurge:15
+      6689.556 : WtShoes/ToApprec/LotParty/WProp/SMalice:15/FAccretion:15/MFlame:15
+      6681.679 : WtShoes/RPalate/EIngredients/WProp/MFlame:15/ICascade:15
+      6680.264 : LGait/ToApprec/EIngredients/WProp/MFlame:15/ICascade:15/GSurge:15
+      6679.453 : LGait/ToApprec/LotParty/WProp/SMalice:15/FAccretion:15/GSurge:15
+      6678.574 : LGait/RPalate/LotParty/WProp/ICascade:15/GSurge:15
+      6676.832 : LGait/ToApprec/LotParty/WProp/MFlame:15/ICascade:15/GSurge:15
+      6675.223 : LGait/RPalate/EIngredients/WProp/ICascade:15/GSurge:15
+      6673.427 : WtShoes/RPalate/LotParty/WProp/SMalice:15/FAccretion:15
+      6669.540 : WtShoes/RPalate/LotParty/WProp/MFlame:15/ICascade:15
+      6667.428 : LGait/SShade/LotParty/WProp/FAccretion:15/GSurge:15
+      6666.782 : WtShoes/ToApprec/EIngredients/WProp/SMalice:15/FAccretion:15/MFlame:15
+      6664.701 : WtShoes/RPalate/EIngredients/WProp/SMalice:15/FAccretion:15
+      6662.825 : LGait/SShade/EIngredients/WProp/FAccretion:15/GSurge:15
+      6660.706 : LGait/ToApprec/EIngredients/WProp/SMalice:15/FAccretion:15/GSurge:15
+      6650.767 : WtShoes/SShade/EIngredients/WProp/FAccretion:15/MFlame:15/GSurge:15
+      6650.522 : WtShoes/SShade/LotParty/WProp/FAccretion:15/MFlame:15/GSurge:15
+      6585.179 : WtShoes/RPalate/LotParty/WProp/FAccretion:15/MFlame:15
+      6575.305 : WtShoes/RPalate/EIngredients/WProp/FAccretion:15/MFlame:15
+      6571.949 : LGait/ToApprec/LotParty/WProp/FAccretion:15/MFlame:15/GSurge:15
+      6570.956 : LGait/RPalate/EIngredients/WProp/FAccretion:15/GSurge:15
+      6567.060 : LGait/RPalate/LotParty/WProp/FAccretion:15/GSurge:15
+      6551.697 : LGait/ToApprec/EIngredients/WProp/FAccretion:15/MFlame:15/GSurge:15
+      6485.440 : LGait/SShade/LotParty/WProp/SMalice:15/GSurge:15
+      6475.991 : WtShoes/SShade/LotParty/WProp/SMalice:15/MFlame:15/GSurge:15
+      6473.715 : LGait/SShade/EIngredients/WProp/SMalice:15/GSurge:15
+      6469.787 : WtShoes/SShade/EIngredients/WProp/SMalice:15/MFlame:15/GSurge:15
+      6400.103 : LGait/ToApprec/EIngredients/WProp/SMalice:15/MFlame:15/GSurge:15
+      6395.793 : LGait/RPalate/LotParty/WProp/SMalice:15/GSurge:15
+      6390.438 : LGait/RPalate/EIngredients/WProp/SMalice:15/GSurge:15
+      6389.750 : WtShoes/RPalate/LotParty/WProp/SMalice:15/MFlame:15
+      6381.196 : LGait/ToApprec/LotParty/WProp/SMalice:15/MFlame:15/GSurge:15
+      6379.977 : WtShoes/RPalate/EIngredients/WProp/SMalice:15/MFlame:15
+      6368.534 : LGait/SShade/EIngredients/WProp/MFlame:15/GSurge:15
+      6353.548 : LGait/SShade/LotParty/WProp/MFlame:15/GSurge:15
+      6293.801 : LGait/RPalate/EIngredients/WProp/MFlame:15/GSurge:15
+      6284.302 : LGait/RPalate/LotParty/WProp/MFlame:15/GSurge:15
 
 
 Baseline Performance:
   No-Networking = true
   RNG Engine    = xoshiro256+
-  Iterations    = 1111 (278, 278, 279, 276)
-  TotalEvents   = 544392633
-  MaxEventQueue = 59
-  TargetHealth  = 1859316
-  SimSeconds    = 331030.674
-  CpuSeconds    = 329.609375
-  WallSeconds   = 83.3176226
-  InitSeconds   = 0.6636120000000001
-  MergeSeconds  = 0.0692098
-  AnalyzeSeconds= 0.0496477
-  SpeedUp       = 1008
-  EndTime       = 2020-09-17 22:37:02-0400 (1600396622)
+  Iterations    = 1011 (255, 237, 248, 271)
+  TotalEvents   = 557305579
+  MaxEventQueue = 46
+  TargetHealth  = 2072757
+  SimSeconds    = 302110.536
+  CpuSeconds    = 304.765625
+  WallSeconds   = 76.6526079
+  InitSeconds   = 0.6374431
+  MergeSeconds  = 0.0496156
+  AnalyzeSeconds= 0.0437965
+  SpeedUp       = 995
+  EndTime       = 2020-10-07 06:43:25-0400 (1602067405)
 
 
 Waiting:

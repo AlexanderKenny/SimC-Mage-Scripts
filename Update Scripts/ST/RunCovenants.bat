@@ -17,7 +17,7 @@ for /R "D:\SimC Scripts\Dump\Input\Base" %%X IN (*.*) do (
     SET spec=%%~nX
     SET "ourDirectory=D:\SimC Scripts\Dump\Input\Cov\R7\!spec!"
     SET "baseFile=%%X"
-    call :loopSoulbinds5 ourDirectory!, baseFile, spec
+    call :loopSoulbinds7 ourDirectory!, baseFile, spec
 )
 for /R "D:\SimC Scripts\Dump\Input\Base" %%X IN (*.*) do (
     SET spec=%%~nX
