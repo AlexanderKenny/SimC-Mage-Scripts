@@ -1,4 +1,5 @@
 @echo off
+cd /D "%~dp0"
 CALL "..\simc.exe" "GenericOptions.simc" "..\..\Dump\Input\Base\Arcane.simc" "talents=0000000" "..\..\Dump\Input\Talents\Talents_Arcane.simc"
 MOVE /Y "output.txt" "D:\SimC Scripts\Dump\Output\Talents\ST\Arcane_Base.txt"
 MOVE /Y "output.json" "D:\SimC Scripts\Dump\Output\Talents\ST\Arcane_Base.json"
